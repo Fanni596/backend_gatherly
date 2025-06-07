@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GatherlyAPIv0.0.1")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d3fca9c4d2f68c099b217f2eff9e120cf506b76e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5659e7434826f05b89095f62ea502d2648831948")]
 [assembly: System.Reflection.AssemblyProductAttribute("GatherlyAPIv0.0.1")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GatherlyAPIv0.0.1")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
