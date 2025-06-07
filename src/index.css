@@ -1,0 +1,13 @@
+@import "tailwindcss";
+/* styles.css */
+:root {
+    --primary: #d93f60; /* Bright Pink */
+    --accent: #bc627f; /* Gold */
+    --background: #ffffffee; /* Warm Beige */
+    --text: #4B5563; /* Muted Gray */
+    --cta: #536cea; /* Blue */
+  }
+
+  html {
+    scroll-behavior: auto;
+  }

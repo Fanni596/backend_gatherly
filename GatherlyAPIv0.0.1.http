@@ -1,6 +1,0 @@
-@GatherlyAPIv0._0._1_HostAddress = http://localhost:5093
-
-GET {{GatherlyAPIv0._0._1_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
