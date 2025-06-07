@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\GatherlyAPIv0.0.1.props" />
+</Project>
