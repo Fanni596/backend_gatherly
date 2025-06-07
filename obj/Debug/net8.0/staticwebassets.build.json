@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ey1DAo89XHU6dMLGEjZ9f6sgfZRF68uKFXJaHdRgCgg=",
+  "Hash": "ntHMfVuXfKn6hZsUrIgbdRtaVjQuaUjhTOH1ufz2JDw=",
   "Source": "GatherlyAPIv0.0.1",
   "BasePath": "_content/GatherlyAPIv0.0.1",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "GatherlyAPIv0.0.1\\wwwroot",
       "Source": "GatherlyAPIv0.0.1",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -38,10 +38,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -59,10 +59,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/1583d644-951d-44bf-b188-bc4217c5fe38_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -80,10 +80,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/1a724486-aa69-4dcc-bd48-9339fcbf2061_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -101,10 +101,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/1d7bc8d2-3590-424b-afb1-f01c45800ecc_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -122,10 +122,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/2097c25c-a473-4137-9561-068d81c6c7a0_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -143,10 +143,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -164,10 +164,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -185,10 +185,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -206,10 +206,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/6c13e408-0669-47d9-92dc-cdb5d0580cf6_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -227,10 +227,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/6fe80b3e-c935-474e-9d97-80e3414e74fa_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -248,10 +248,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/73054131-197f-47f3-bbea-cc59ee6a6874_download#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -269,10 +269,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -290,10 +290,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -311,10 +311,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -332,10 +332,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/d1dee682-9c41-4fde-83a3-44e126c05adb_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -353,10 +353,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_images/e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1#[.{fingerprint}]?.png",
       "AssetKind": "All",
@@ -374,10 +374,10 @@
       "OriginalItemSpec": "wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png"
     },
     {
-      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
+      "Identity": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
       "SourceId": "GatherlyAPIv0.0.1",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\",
       "BasePath": "_content/GatherlyAPIv0.0.1",
       "RelativePath": "uploads/event_videos/14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37#[.{fingerprint}]?.mp4",
       "AssetKind": "All",
@@ -398,7 +398,7 @@
   "Endpoints": [
     {
       "Route": "uploads/event_images/0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jeyq20pujv.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -443,7 +443,7 @@
     },
     {
       "Route": "uploads/event_images/0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0aaa08d7-1b37-49dd-b6e0-730685fb43bf_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -480,7 +480,7 @@
     },
     {
       "Route": "uploads/event_images/0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.91lavv7vbq.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -525,7 +525,7 @@
     },
     {
       "Route": "uploads/event_images/0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\0de856f7-1640-443f-8eb3-991dbeaea640_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -562,7 +562,7 @@
     },
     {
       "Route": "uploads/event_images/1583d644-951d-44bf-b188-bc4217c5fe38_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -607,7 +607,7 @@
     },
     {
       "Route": "uploads/event_images/1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1583d644-951d-44bf-b188-bc4217c5fe38_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -644,7 +644,7 @@
     },
     {
       "Route": "uploads/event_images/1a724486-aa69-4dcc-bd48-9339fcbf2061_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -689,7 +689,7 @@
     },
     {
       "Route": "uploads/event_images/1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1a724486-aa69-4dcc-bd48-9339fcbf2061_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -726,7 +726,7 @@
     },
     {
       "Route": "uploads/event_images/1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -771,7 +771,7 @@
     },
     {
       "Route": "uploads/event_images/1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\1d7bc8d2-3590-424b-afb1-f01c45800ecc_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -808,7 +808,7 @@
     },
     {
       "Route": "uploads/event_images/2097c25c-a473-4137-9561-068d81c6c7a0_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -853,7 +853,7 @@
     },
     {
       "Route": "uploads/event_images/2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2097c25c-a473-4137-9561-068d81c6c7a0_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -890,7 +890,7 @@
     },
     {
       "Route": "uploads/event_images/2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.91lavv7vbq.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -935,7 +935,7 @@
     },
     {
       "Route": "uploads/event_images/2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2269554a-6606-4602-93b2-3dacbd0c10ec_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -972,7 +972,7 @@
     },
     {
       "Route": "uploads/event_images/2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.91lavv7vbq.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1017,7 +1017,7 @@
     },
     {
       "Route": "uploads/event_images/2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\2767e11e-c968-4da2-9f5d-485067db97d5_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1054,7 +1054,7 @@
     },
     {
       "Route": "uploads/event_images/3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1099,7 +1099,7 @@
     },
     {
       "Route": "uploads/event_images/3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\3b0524c6-5cf0-4dae-9e8b-bd3cb52862cb_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1136,7 +1136,7 @@
     },
     {
       "Route": "uploads/event_images/6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1181,7 +1181,7 @@
     },
     {
       "Route": "uploads/event_images/6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6c13e408-0669-47d9-92dc-cdb5d0580cf6_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1218,7 +1218,7 @@
     },
     {
       "Route": "uploads/event_images/6fe80b3e-c935-474e-9d97-80e3414e74fa_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1263,7 +1263,7 @@
     },
     {
       "Route": "uploads/event_images/6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\6fe80b3e-c935-474e-9d97-80e3414e74fa_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1300,7 +1300,7 @@
     },
     {
       "Route": "uploads/event_images/73054131-197f-47f3-bbea-cc59ee6a6874_download.jeyq20pujv.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1345,7 +1345,7 @@
     },
     {
       "Route": "uploads/event_images/73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\73054131-197f-47f3-bbea-cc59ee6a6874_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1382,7 +1382,7 @@
     },
     {
       "Route": "uploads/event_images/768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.91lavv7vbq.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1427,7 +1427,7 @@
     },
     {
       "Route": "uploads/event_images/768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\768bf702-c5ec-453b-85b6-9a08468d4b53_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1464,7 +1464,7 @@
     },
     {
       "Route": "uploads/event_images/853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jeyq20pujv.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1509,7 +1509,7 @@
     },
     {
       "Route": "uploads/event_images/853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\853d47cf-6ed4-43ff-bfd2-e913dd9349b0_download.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1546,7 +1546,7 @@
     },
     {
       "Route": "uploads/event_images/c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.91lavv7vbq.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1591,7 +1591,7 @@
     },
     {
       "Route": "uploads/event_images/c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\c38ee03d-5dfc-453a-b4b4-c4416a383c73_4e415339-e5ab-44f6-8f4a-dc9692589c9f.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1628,7 +1628,7 @@
     },
     {
       "Route": "uploads/event_images/d1dee682-9c41-4fde-83a3-44e126c05adb_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1673,7 +1673,7 @@
     },
     {
       "Route": "uploads/event_images/d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\d1dee682-9c41-4fde-83a3-44e126c05adb_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1710,7 +1710,7 @@
     },
     {
       "Route": "uploads/event_images/e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.nimkxtwvkf.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1755,7 +1755,7 @@
     },
     {
       "Route": "uploads/event_images/e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_images\\e49f2de7-8c4e-4d6d-80a2-824ca69091f4_1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1792,7 +1792,7 @@
     },
     {
       "Route": "uploads/event_videos/14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1829,7 +1829,7 @@
     },
     {
       "Route": "uploads/event_videos/14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.tls1f8etu7.mp4",
-      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
+      "AssetFile": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\wwwroot\\uploads\\event_videos\\14c55f7a-c491-4f3f-881a-86402c01d459_Swagger UI - Google Chrome 2025-04-10 12-05-37.mp4",
       "Selectors": [],
       "ResponseHeaders": [
         {

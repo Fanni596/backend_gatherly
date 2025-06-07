@@ -2538,11 +2538,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1.csproj",
+      "projectUniqueName": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1.csproj",
       "projectName": "GatherlyAPIv0.0.1",
-      "projectPath": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1.csproj",
+      "projectPath": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1.csproj",
       "packagesPath": "C:\\Users\\jaaan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\GatherlyAPIv0.0.1\\GatherlyAPIv0.0.1\\obj\\",
+      "outputPath": "C:\\Users\\jaaan\\Desktop\\backend_gatherly\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
