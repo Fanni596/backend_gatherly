@@ -606,11 +606,11 @@ const CreateEventAI = () => {
       if (eventData.registrationExpiry) {
         eventPayload.append("RegistrationExpiry", eventData.registrationExpiry.toISOString())
       }
-
+      
       // Create the event
       const response = await eventService.createEvent(eventPayload)
       const eventId = response.eventId
-
+      
       // Upload selected image if available
       if (selectedImage && selectedImage.file) {
         await eventService.uploadImages(eventId, [selectedImage.file])
@@ -619,6 +619,7 @@ const CreateEventAI = () => {
       }
 
       // Redirect to edit page
+      await eventService.createDefaultList(eventId, formData.title);
       navigate(`/events/edit/${eventId}`)
     } catch (err) {
       console.error("Event creation error:", err)
