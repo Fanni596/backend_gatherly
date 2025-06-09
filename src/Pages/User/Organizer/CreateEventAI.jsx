@@ -619,13 +619,12 @@ const CreateEventAI = () => {
       }
 
       // Redirect to edit page
-     
+     await eventService.createDefaultList(eventId, eventData.title);
       navigate(`/events/edit/${eventId}`)
     } catch (err) {
       console.error("Event creation error:", err)
       setError("Failed to create event. Please try again.")
     } finally {
-eventService.createDefaultList(eventId, formData.title);
       setLoading(false)
     }
   }
