@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
-import profileService from '../../../Services/profileServices';
+import profileService from '../../../Services/ProfileServices';
 import Modal from 'react-modal';
 
 // Set modal root for accessibility
