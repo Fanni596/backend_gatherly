@@ -1328,12 +1328,14 @@ const handleViewAttendees = () => {
                 >
                   <FaEdit className="mr-2 h-4 w-4" /> Edit
                 </button>
-                <button
+                {event.status === "published" && (
+                  <button
                   onClick={handleManageEvent}
                   className="flex items-center px-4 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-sm font-medium"
-                >
+                  >
                   <FaCog className="mr-2 h-4 w-4" /> Manage
                 </button>
+                )}
               </>
             ) : (
               <>
