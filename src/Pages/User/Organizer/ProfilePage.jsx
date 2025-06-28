@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
-import ProfileService from '../../../services/ProfileServices';
+import profileService from '../../../Services/profileServices';
 // import Modal from 'react-modal';
 
 // Set modal root for accessibility
@@ -56,7 +56,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await ProfileService.getProfile();
+        const data = await profileService.getProfile();
         setUserData(data);
         reset({
           firstName: data.firstName,
@@ -81,7 +81,7 @@ const ProfilePage = () => {
 
     const fetchProfilePicture = async () => {
       try {
-        const blob = await ProfileService.getProfilePicture();
+        const blob = await profileService.getProfilePicture();
         const imageUrl = URL.createObjectURL(blob);
         setProfilePicture(imageUrl);
       } catch (error) {
@@ -130,10 +130,10 @@ const ProfilePage = () => {
 
   const handleUpdateProfile = async (data) => {
     try {
-      const response = await ProfileService.updateProfile(data);
+      const response = await profileService.updateProfile(data);
       toast.success(response.message);
       setEditMode(false);
-      const profileData = await ProfileService.getProfile();
+      const profileData = await profileService.getProfile();
       setUserData(profileData);
     } catch (error) {
       toast.error(error.message || 'Failed to update profile');
@@ -142,7 +142,7 @@ const ProfilePage = () => {
 
   const handleChangePassword = async (data) => {
     try {
-      const response = await ProfileService.changePassword(data);
+      const response = await profileService.changePassword(data);
       toast.success(response.message);
       setPasswordMode(false);
       reset({
@@ -316,11 +316,11 @@ const ProfilePage = () => {
 
     try {
       setIsUploading(true);
-      const response = await ProfileService.uploadProfilePicture(profilePictureFile);
+      const response = await profileService.uploadProfilePicture(profilePictureFile);
       toast.success(response.message);
-      const profileData = await ProfileService.getProfile();
+      const profileData = await profileService.getProfile();
       setUserData(profileData);
-      const blob = await ProfileService.getProfilePicture();
+      const blob = await profileService.getProfilePicture();
       setProfilePicture(URL.createObjectURL(blob));
       setProfilePictureFile(null);
     } catch (error) {
@@ -332,11 +332,11 @@ const ProfilePage = () => {
 
   const deleteProfilePicture = async () => {
     try {
-      const response = await ProfileService.deleteProfilePicture();
+      const response = await profileService.deleteProfilePicture();
       toast.success(response.message);
       setProfilePicture(null);
       setProfilePictureFile(null);
-      const profileData = await ProfileService.getProfile();
+      const profileData = await profileService.getProfile();
       setUserData(profileData);
     } catch (error) {
       toast.error(error.message || 'Failed to delete profile picture');
@@ -776,7 +776,7 @@ const ProfilePage = () => {
                               onClick={() => {
                                 setProfilePictureFile(null);
                                 if (userData.hasProfilePicture) {
-                                  setProfilePicture(URL.createObjectURL(ProfileService.getProfilePicture()));
+                                  setProfilePicture(URL.createObjectURL(profileService.getProfilePicture()));
                                 } else {
                                   setProfilePicture(null);
                                 }
