@@ -35,7 +35,6 @@ import AttendedEventsFeedbackPage from './Pages/User/Attendee/AttendedEventsFeed
 import AttendeeSelfCheckin from './Pages/User/Attendee/AttendeeSelfCheckin'
 import QRCodeScanner from './Pages/User/Attendee/QRCodeScanner'
 import HelpAndSupport from './Pages/HelpAndSupport'
-import BS from './Auths/bs'
 
 function App() {
 
@@ -52,7 +51,6 @@ function App() {
             <Route path="/" element={<Navigate to="/attendee" replace />} />
             <Route path="/help" element={<HelpAndSupport />} />
             <Route path="attendee/help" element={<HelpAndSupport />} />
-            <Route path="/bs" element={<BS />} />
 
 
 
