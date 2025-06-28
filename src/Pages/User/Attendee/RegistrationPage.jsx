@@ -296,7 +296,11 @@ useEffect(() => {
         }
 
         // Generate invite link with phone number
-        const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${values.phone}`
+        // const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${values.phone}`
+
+        const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${
+  values.phone.replace(/^\+92/, '0')
+}`;
 
         // Send invite based on selected method
         if (verificationMethod === "email") {
@@ -343,8 +347,12 @@ useEffect(() => {
   const resendInvite = async () => {
     try {
       setLoading(true)
-      const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${formik.values.phone}`
-      
+      // const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${formik.values.phone}`
+      const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${
+  formik.values.phone.replace(/^\+92/, '0')
+}`;
+
+ 
       if (verificationMethod === "email") {
         await eventViewService.sendEmailInvite(
           eventId,

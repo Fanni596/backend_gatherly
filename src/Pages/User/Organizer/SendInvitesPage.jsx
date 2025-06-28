@@ -181,7 +181,7 @@ const SendInvitesPage = () => {
       }
     }
     // Generate the invite link with event details
-   const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${attendee?.Phone || ""}`
+   const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${attendee?.Phone.replace(/^\+92/, '0') || ""}`
 
     // Append event details and link to the user's message
     return `${message}
