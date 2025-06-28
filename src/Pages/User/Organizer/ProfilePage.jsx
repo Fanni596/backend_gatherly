@@ -11,7 +11,7 @@ import {
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import profileService from '../../../services/profileServices';
-import Modal from 'react-modal';
+// import Modal from 'react-modal';
 
 // Set modal root for accessibility
 Modal.setAppElement('#root');
