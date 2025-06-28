@@ -5,6 +5,7 @@ import jsQR from 'jsqr';
 const QRCodeScanner = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const streamRef = useRef(null); // Add a ref to track the stream
 
   const [qrData, setQrData] = useState(null);
   const [error, setError] = useState(null);
@@ -17,6 +18,7 @@ const QRCodeScanner = () => {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' }
         });
+        streamRef.current = stream; // Store the stream in the ref
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       } catch (err) {
@@ -27,14 +29,25 @@ const QRCodeScanner = () => {
 
     getCamera();
 
+    // Cleanup function
     return () => {
-      const stream = videoRef.current?.srcObject;
-      stream?.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => {
+          track.stop(); // Stop each track
+        });
+      }
+      
+      // Also clean up the video element reference
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, []);
 
   // QR scanning loop
   useEffect(() => {
+    let animationFrameId = null;
+    
     const scan = () => {
       const canvas = canvasRef.current;
       const video = videoRef.current;
@@ -52,16 +65,30 @@ const QRCodeScanner = () => {
       if (code) {
         setQrData(code.data);
         setScanning(false);
-      } else {
-        requestAnimationFrame(scan);
+      } else if (scanning) {
+        animationFrameId = requestAnimationFrame(scan);
       }
     };
 
     if (videoRef.current && scanning) {
-      videoRef.current.onloadedmetadata = () => {
-        requestAnimationFrame(scan);
-      };
+      if (videoRef.current.readyState >= videoRef.current.HAVE_METADATA) {
+        animationFrameId = requestAnimationFrame(scan);
+      } else {
+        videoRef.current.onloadedmetadata = () => {
+          animationFrameId = requestAnimationFrame(scan);
+        };
+      }
     }
+
+    // Cleanup function for scanning loop
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (videoRef.current) {
+        videoRef.current.onloadedmetadata = null;
+      }
+    };
   }, [scanning]);
 
   const isUrl = (text) => {
