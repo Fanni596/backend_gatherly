@@ -40,10 +40,10 @@ const Dashboard = () => {
     checkAuth()
     fetchDashboardData()
   }, [])
-  
-if (user && user.role === "Attendee") {
-  Navigate("/events")
-}
+
+  if (user && user.role === "Attendee") {
+    Navigate("/events")
+  }
   const fetchDashboardData = async () => {
     setLoading(true)
     try {
@@ -138,7 +138,7 @@ if (user && user.role === "Attendee") {
         ) : (
           <>
             {/* Cards Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-indigo-100 rounded-full">
@@ -159,18 +159,6 @@ if (user && user.role === "Attendee") {
                   <div>
                     <p className="text-lg font-semibold">Upcoming Events</p>
                     <p className="text-2xl font-bold">{stats.upcomingEvents}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <FiUsers className="text-2xl text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-semibold">Total Attendees</p>
-                    <p className="text-2xl font-bold">{stats.totalAttendees}</p>
                   </div>
                 </div>
               </div>
@@ -251,13 +239,12 @@ if (user && user.role === "Attendee") {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span
                                 className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                ${
-                                  event.status === "published"
+                                ${event.status === "published"
                                     ? "bg-green-100 text-green-800"
                                     : event.status === "draft"
                                       ? "bg-yellow-100 text-yellow-800"
                                       : "bg-red-100 text-red-800"
-                                }`}
+                                  }`}
                               >
                                 {event.status || "draft"}
                               </span>

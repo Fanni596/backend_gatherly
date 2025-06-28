@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useContext } from "react"
+import { useState, useEffect, useCallback, useContext, use } from "react"
 import { Link } from "react-router-dom"
 import { AuthContext } from "../../../Contexts/authContext"
+import ProtectedRoute from "../../../Config/ProtectedRoute"
 import {
   FaCalendarAlt,
   FaClock,
@@ -26,13 +27,11 @@ import {
 import { toast } from "react-toastify"
 import eventViewService from "../../../Services/eventViewServices"
 import { motion, AnimatePresence } from "framer-motion"
-const VITE_API_IMG_BASE_URL = import.meta.env.VITE_API_IMG_BASE_URL; // Replace with your actual API URL
+const VITE_API_IMG_BASE_URL = import.meta.env.VITE_API_IMG_BASE_URL;
 
 // Event Card Component
 const EventCard = ({ event, featured = false }) => {
-  const [isSaved, setIsSaved] = useState(event.is_saved || false)
-  const [isLiked, setIsLiked] = useState(event.is_liked || false)
-  const [likeCount, setLikeCount] = useState(event.like_count || 0)
+
   const formatDate = (dateString) => {
     const options = { weekday: "short", month: "short", day: "numeric" }
     return new Date(dateString).toLocaleDateString("en-US", options)
@@ -44,81 +43,23 @@ const EventCard = ({ event, featured = false }) => {
     return time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
   }
 
-  const handleSave = async (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    try {
-      // Call API to toggle save status
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/save`, {
-        method: "POST",
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to update saved status")
-      }
-
-      const data = await response.json()
-      setIsSaved(data.isSaved)
-      toast.success(data.isSaved ? "Added to saved events" : "Removed from saved events")
-    } catch (error) {
-      if (error.message.includes("sign in")) {
-        toast.error("Please sign in to save events")
-      } else {
-        toast.error(error.message || "Failed to update saved status")
-      }
-    }
-  }
-
-  const handleLike = async (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    try {
-      // Call API to toggle like status
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/like`, {
-        method: "POST",
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to update like status")
-      }
-
-      const data = await response.json()
-      setIsLiked(data.isLiked)
-      setLikeCount(data.likeCount)
-      toast.success(data.isLiked ? "Added to liked events" : "Removed from liked events")
-    } catch (error) {
-      if (error.message.includes("sign in")) {
-        toast.error("Please sign in to like events")
-      } else {
-        toast.error(error.message || "Failed to update like status")
-      }
-    }
-  }
-
   return (
-    <Link to={`/events/${event.id}`} className="block h-full">
+    <Link to={`/attendee/events/${event.id}`} className="block h-full">
       <motion.div
         whileHover={{ y: -5 }}
         transition={{ duration: 0.2 }}
         className={`bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all h-full border ${featured ? "border-indigo-200" : "border-gray-100"}`}
       >
-        {/* {console.log(`https://localhost:7255/${event.thumbnail.file_path}`)} */}
         <div className="relative h-48 bg-gray-200">
           {event.thumbnail ? (
             <img
-              src={VITE_API_IMG_BASE_URL + `/${event.thumbnail.file_path}`}
+              src={VITE_API_IMG_BASE_URL + event.thumbnail.file_path}
               alt={event.title}
               className="w-full h-full object-cover"
-              // onError={(e) => {
-              //   e.target.onerror = null
-              //   e.target.src = "/placeholder.svg?height=192&width=384"
-              // }}
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src = "/placeholder.svg"
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-400">
@@ -131,29 +72,6 @@ const EventCard = ({ event, featured = false }) => {
               <FaStar className="mr-1" /> Featured
             </div>
           )}
-
-          <div className="absolute top-3 right-3 flex space-x-2">
-            <button
-              onClick={handleSave}
-              className={`p-2 rounded-full ${
-                isSaved ? "bg-indigo-600 text-white" : "bg-white/90 text-gray-700 hover:bg-white"
-              } transition-colors shadow-sm`}
-              aria-label={isSaved ? "Unsave event" : "Save event"}
-            >
-              {isSaved ? <FaBookmark className="h-4 w-4" /> : <FaRegBookmark className="h-4 w-4" />}
-            </button>
-            <button
-              onClick={handleLike}
-              className={`p-2 rounded-full ${
-                isLiked ? "bg-pink-600 text-white" : "bg-white/90 text-gray-700 hover:bg-white"
-              } transition-colors shadow-sm flex items-center`}
-              aria-label={isLiked ? "Unlike event" : "Like event"}
-            >
-              {isLiked ? <FaHeart className="h-4 w-4" /> : <FaRegHeart className="h-4 w-4" />}
-              {likeCount > 0 && <span className="ml-1 text-xs">{likeCount}</span>}
-            </button>
-          </div>
-
           {event.ticket_type === "paid" && (
             <div className="absolute bottom-3 left-3 bg-white/90 text-indigo-600 text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-sm flex items-center">
               <FaTicketAlt className="mr-1" />
@@ -352,13 +270,7 @@ const HeroSection = () => {
               <FaSearch className="mr-2 h-5 w-5" />
               Browse Events
             </Link>
-            <Link
-              to="/create-event"
-              className="bg-indigo-800 text-white hover:bg-indigo-900 font-bold py-3 px-6 rounded-lg transition-colors shadow-md inline-flex items-center justify-center"
-            >
-              <FaCalendarAlt className="mr-2 h-5 w-5" />
-              Create Event
-            </Link>
+         
           </div>
         </motion.div>
       </div>
@@ -696,13 +608,14 @@ const FeaturedEvents = ({ events, isLoading, error }) => {
             onClick={nextPage}
             className="p-2 rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
             aria-label="Next page"
-          >
+            >
             <FaChevronRight className="h-5 w-5" />
           </button>
         </div>
       )}
     </div>
   )
+
 }
 
 // Newsletter Component
@@ -795,113 +708,118 @@ const AttendeeHome = () => {
     price: "",
     location: "",
   })
+  const { attendeeUser, AttendeecheckAuth } = useContext(AuthContext)
+
+  useEffect(() => {
+    // Check if user is authenticated
+    AttendeecheckAuth()
+  }, [])
 
   const fetchFeaturedEvents = useCallback(async () => {
+    setError(null); // Reset error state
+    setIsLoading(true); // Set loading before fetch
     try {
-      setIsLoading(true)
       const events = await eventViewService.getAllEvents()
       
-      // Filter for featured events (you might have a different criteria)
+      // Filter for featured events (assuming "featured" means published, public, and future, up to 8)
       const featured = events
         .filter(
           (event) =>
-            event.status === "published" && event.visibility === "public" && new Date(event.start_date) >= new Date(),
+            event.status === "published" && 
+            event.visibility === "public" && 
+            new Date(event.start_date) >= new Date()
         )
-        .slice(0, 8) // Limit to 8 events
+        .slice(0, 8) // Limit to 8 events for featured section
 
-      // Fetch media for each event
+      // Fetch media for each event and user-specific like/save status
       const eventsWithMedia = await Promise.all(
         featured.map(async (event) => {
           try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/media`, {
-              credentials: true,
+            const mediaResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/media`, {
+              credentials: "include",
             })
 
-            if (!response.ok) {
-              throw new Error("Failed to fetch event media")
+            if (!mediaResponse.ok) {
+              // Even if media fails, still show the event (with a placeholder if no thumbnail)
+              console.warn(`Failed to fetch media for event ${event.id}:`, mediaResponse.statusText);
             }
-
-            const mediaData = await response.json()
-            const thumbnail = mediaData.images.find((img) => img.is_thumbnail) || mediaData.images[0] || null
+            const mediaData = mediaResponse.ok ? await mediaResponse.json() : { images: [], videos: [] };
+            const thumbnail = mediaData.images?.find((img) => img.is_thumbnail) || mediaData.images?.[0] || null
 
             return {
               ...event,
               thumbnail,
-              media: mediaData,
+              media: mediaData
+
             }
-          } catch (error) {
-            console.error(`Error fetching media for event ${event.id}:`, error)
+          } catch (fetchError) {
+            console.error(`Error processing event ${event.id}:`, fetchError)
             return {
               ...event,
               thumbnail: null,
               media: { images: [], videos: [] },
             }
           }
-        }),
+        })
       )
-      console.log("Featured events with media:", eventsWithMedia)
+
       setFeaturedEvents(eventsWithMedia)
-      setIsLoading(false)
-    } 
-    catch (err) {
-      setError(err.message || "Failed to load featured events")
+    } catch (err) {
+      console.error("Failed to fetch featured events:", err)
+      setError("Failed to load events. Please try again later.")
+      toast.error("Failed to load events: " + err.message)
+    } finally {
       setIsLoading(false)
     }
-  }, [])
-  const {AttendeecheckAuth} = useContext(AuthContext)
+  }, [attendeeUser]); // Re-fetch if user changes, as like/save status depends on user
 
   useEffect(() => {
-    AttendeecheckAuth()
-    fetchFeaturedEvents()
-  }, [fetchFeaturedEvents])
+    fetchFeaturedEvents();
+  }, [fetchFeaturedEvents]); // Depend on memoized fetchFeaturedEvents
 
-  const applyFilters = () => {
-    // This would typically filter the events based on the selected filters
-    // For now, we'll just log the filters and refetch events
-    console.log("Applying filters:", filters)
-    fetchFeaturedEvents()
-  }
+
+  // This function would typically trigger a re-fetch of all events with the new filters
+  // For this component, it just logs, as only featured events are explicitly fetched without filters.
+  const handleApplyFilters = () => {
+    console.log("Applying filters:", filters);
+    // In a full implementation, you would fetch all events here based on `filters`
+    // e.g., fetchAllEvents(filters);
+  };
 
   return (
-    <div className="bg-gray-50">
+    <div className="min-h-screen bg-gray-50 font-sans antialiased">
       <HeroSection />
 
-      <div className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-left">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Featured Events</h2>
-              <p className="text-gray-600 max-w-2xl">
-                Discover our handpicked selection of the most exciting upcoming events. Don't miss out!
-              </p>
-            </motion.div>
-
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+            <h2 className="text-3xl font-bold text-gray-900">Featured Events</h2>
+            <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center text-indigo-600 hover:text-indigo-700 font-medium"
+              className="flex items-center text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
             >
-              <FaFilter className="mr-2 h-4 w-4" />
+              <FaFilter className="mr-2" />
               {showFilters ? "Hide Filters" : "Show Filters"}
-            </motion.button>
+            </button>
           </div>
 
-          {showFilters && <EventFilters filters={filters} setFilters={setFilters} onApply={applyFilters} />}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <EventFilters filters={filters} setFilters={setFilters} onApply={handleApplyFilters} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <FeaturedEvents events={featuredEvents} isLoading={isLoading} error={error} />
-
-          <div className="mt-12 text-center">
-            <Link
-              to="/events"
-              className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium text-lg"
-            >
-              View All Events
-              <FaArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
         </div>
-      </div>
+      </section>
 
       <CategoriesSection />
 
@@ -950,8 +868,7 @@ const AttendeeHome = () => {
         </div>
       </div>
     </div>
-)}
-
-
+  )
+}
 
 export default AttendeeHome

@@ -17,6 +17,14 @@ const listService = {
       throw error.response?.data || { message: 'Error fetching attendees' };
     }
   },
+  getAttachedListAttendees: async (listId) => {
+    try {
+      const response = await api.get(`/organizer/attendees/getallAttached?listId=${listId}`);
+      return response.data || [];
+    } catch (error) {
+      throw error.response?.data || { message: 'Error fetching attendees' };
+    }
+  },
 
   // Send email invite to an attendee
   sendEmailInvite: async (eventId, attendeeId, message) => {

@@ -597,7 +597,7 @@ const CreateEventAI = () => {
       eventPayload.append("Location", eventData.location)
       eventPayload.append("TicketType", eventData.ticketType)
       eventPayload.append("TicketPrice", Number.parseFloat(eventData.ticketPrice) || 0)
-      eventPayload.append("Capacity", 0) // Default capacity
+      eventPayload.append("Capacity", 1) // Default capacity
       eventPayload.append("Status", status)
       eventPayload.append("Visibility", "public")
       eventPayload.append("OrganizerName", user.firstName + " " + user.lastName) // Add organizer name
@@ -606,25 +606,29 @@ const CreateEventAI = () => {
       if (eventData.registrationExpiry) {
         eventPayload.append("RegistrationExpiry", eventData.registrationExpiry.toISOString())
       }
-      
       // Create the event
       const response = await eventService.createEvent(eventPayload)
       const eventId = response.eventId
       
+      
+
       // Upload selected image if available
       if (selectedImage && selectedImage.file) {
         await eventService.uploadImages(eventId, [selectedImage.file])
       } else if (eventData.selectedImage && eventData.selectedImage.file) {
         await eventService.uploadImages(eventId, [eventData.selectedImage.file])
       }
-
+      
+      await eventService.createDefaultList(eventId, eventData.title);
+           
       // Redirect to edit page
-      await eventService.createDefaultList(eventId, formData.title);
       navigate(`/events/edit/${eventId}`)
     } catch (err) {
       console.error("Event creation error:", err)
       setError("Failed to create event. Please try again.")
     } finally {
+      console.log("Event creation completed")
+
       setLoading(false)
     }
   }

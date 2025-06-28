@@ -4,10 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import {
   FiEdit, FiTrash, FiUsers, FiPlus, FiX, FiSearch, FiCheck,
-  FiDownload, FiUpload, FiFilter, FiGrid, FiList, FiInfo, FiShare2,
-  FiChevronDown, FiTag, FiCalendar, FiClock, FiRefreshCw, FiAlertTriangle,
-  FiCopy, FiArchive, FiLock, FiEye, FiEyeOff, FiStar, FiMoreVertical,
-  FiArrowUp, FiArrowDown, FiSettings, FiSliders, FiFileText, FiMail
+  FiDownload, FiFilter, FiGrid, FiList, FiInfo, FiShare2,
+  FiChevronDown, FiRefreshCw, FiAlertTriangle,
+  FiCopy, FiArchive, FiLock, FiEye, FiMoreVertical
 } from 'react-icons/fi';
 import {
   CircularProgress,
@@ -67,14 +66,11 @@ import {
   SpeedDialIcon,
   Breadcrumbs,
   Link,
-  Stack
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import { motion, AnimatePresence } from 'framer-motion';
-// import { useDropzone } from 'react-dropzone';
 import { format, formatDistance } from 'date-fns';
 import { CSVLink } from 'react-csv';
-// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 // Styled components with enhanced aesthetics
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -222,8 +218,8 @@ const itemVariants = {
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.4, ease: "easeOut" }
   }
@@ -347,11 +343,11 @@ const ListsPage = () => {
         case 'created_asc':
           return (new Date(a.CreatedDate || 0) - new Date(b.CreatedDate || 0));
         case 'modified_desc':
-          return (new Date(b.LastModifiedDate || b.CreatedDate || 0) - 
-                new Date(a.LastModifiedDate || a.CreatedDate || 0));
+          return (new Date(b.LastModifiedDate || b.CreatedDate || 0) -
+            new Date(a.LastModifiedDate || a.CreatedDate || 0));
         case 'modified_asc':
-          return (new Date(a.LastModifiedDate || a.CreatedDate || 0) - 
-                new Date(b.LastModifiedDate || b.CreatedDate || 0));
+          return (new Date(a.LastModifiedDate || a.CreatedDate || 0) -
+            new Date(b.LastModifiedDate || b.CreatedDate || 0));
         case 'attendees_desc':
           return (b.AttendeeCount || 0) - (a.AttendeeCount || 0);
         case 'attendees_asc':
@@ -385,22 +381,23 @@ const ListsPage = () => {
   const fetchLists = async () => {
     setInitialLoading(true);
     try {
-      const response = await axios.get(import.meta.env.VITE_API_BASE_URL+'/organizer/AttendeeLists/getall', { 
-        withCredentials: true 
+      const response = await axios.get(import.meta.env.VITE_API_BASE_URL + '/organizer/AttendeeLists/getall', {
+        withCredentials: true
       });
-  
+      console.log('Fetched lists:', response.data);
       const enhancedData = Array.isArray(response.data) ? await Promise.all(response.data.map(async list => {
         // Fetch additional attendee stats for each list
         const attendeeStats = await axios.get(
-          import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/stats?listId=${list.Id}`,
+          import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/stats?listId=${list.Id}`,
           { withCredentials: true }
         ).catch(() => null);
-  
+        console.log('Attendee stats for list:', list);
+console.log(attendeeStats);
         return {
           ...list,
-          Tags: Array.isArray(list.Tags) ? list.Tags : 
-               typeof list.Tags === 'string' ? JSON.parse(list.Tags || '[]') : [],
-          AttendeeCount: list.AttendeeCount || 0,
+          Tags: Array.isArray(list.Tags) ? list.Tags :
+            typeof list.Tags === 'string' ? JSON.parse(list.Tags || '[]') : [],
+          AttendeeCount: attendeeStats?.data?.totalAttendees || 0,
           AllowedPeopleTotal: attendeeStats?.data?.totalAllowedPeople || 0,
           IsOwner: list.IsOwner !== undefined ? list.IsOwner : true,
           IsArchived: list.IsArchived || false,
@@ -408,12 +405,11 @@ const ListsPage = () => {
           Category: list.Category || categories[Math.floor(Math.random() * categories.length)]
         };
       })) : [];
-  
+
       setLists(enhancedData);
       setSelectedLists([]);
     } catch (error) {
-      console.error('Failed to fetch lists:', error);
-      showSnackbar('Failed to fetch lists. Please try again.', 'error');
+      showSnackbar('Failed to fetch lists. Please try again.' + error, 'error');
     } finally {
       setInitialLoading(false);
     }
@@ -425,8 +421,7 @@ const ListsPage = () => {
       await fetchLists();
       showSnackbar('Lists refreshed successfully', 'success');
     } catch (error) {
-      console.error('Failed to refresh lists:', error);
-      showSnackbar('Failed to refresh lists', 'error');
+      showSnackbar('Failed to refresh lists' + error, 'error');
     } finally {
       setRefreshing(false);
     }
@@ -440,7 +435,7 @@ const ListsPage = () => {
 
     setLoading(true);
     try {
-      await axios.post(import.meta.env.VITE_API_BASE_URL+'/organizer/AttendeeLists/create', {
+      await axios.post(import.meta.env.VITE_API_BASE_URL + '/organizer/AttendeeLists/create', {
         Name: formData.name,
         Description: formData.description,
         Category: formData.category,
@@ -453,8 +448,7 @@ const ListsPage = () => {
       setModal({ ...modal, create: false });
       setFormData({ name: '', description: '', category: '', tags: [], isPrivate: false });
     } catch (error) {
-      console.error('Failed to create list:', error);
-      showSnackbar('Failed to create list. Please try again.', 'error');
+      showSnackbar('Failed to create list. Please try again.' + error, 'error');
     } finally {
       setLoading(false);
       fetchLists(); // Refresh the list after creation
@@ -469,7 +463,7 @@ const ListsPage = () => {
 
     setLoading(true);
     try {
-      await axios.put(import.meta.env.VITE_API_BASE_URL+`/organizer/AttendeeLists/updateby:${editData.id}`, {
+      await axios.put(import.meta.env.VITE_API_BASE_URL + `/organizer/AttendeeLists/updateby:${editData.id}`, {
         Name: editData.name,
         Description: editData.description,
         Category: editData.category,
@@ -495,8 +489,7 @@ const ListsPage = () => {
       showSnackbar('List updated successfully!', 'success');
       setModal({ ...modal, edit: false });
     } catch (error) {
-      console.error('Failed to update list:', error);
-      showSnackbar('Failed to update list. Please try again.', 'error');
+      showSnackbar('Failed to update list. Please try again.' + error, 'error');
     } finally {
       setLoading(false);
     }
@@ -505,13 +498,12 @@ const ListsPage = () => {
   const handleDeleteList = async () => {
     setLoading(true);
     try {
-      await axios.delete(import.meta.env.VITE_API_BASE_URL+`/organizer/AttendeeLists/deleteby:${listToDelete}`, { withCredentials: true });
+      await axios.delete(import.meta.env.VITE_API_BASE_URL + `/organizer/AttendeeLists/deleteby:${listToDelete}`, { withCredentials: true });
       setLists(prevLists => prevLists.filter(list => list.Id !== listToDelete));
       showSnackbar('List deleted successfully!', 'success');
       setModal({ ...modal, delete: false });
     } catch (error) {
-      console.error('Failed to delete list:', error.response?.data.message || error);
-      showSnackbar('Failed to delete some lists.'+ error.response?.data.message || error +' Please try again.', 'error');
+      showSnackbar('Failed to delete some lists.' + error.response?.data.message || error + ' Please try again.', 'error');
 
     } finally {
       setLoading(false);
@@ -528,7 +520,7 @@ const ListsPage = () => {
     try {
       await Promise.all(
         selectedLists.map(id =>
-          axios.delete(import.meta.env.VITE_API_BASE_URL+`/organizer/AttendeeLists/deleteby:${id}`, { withCredentials: true })
+          axios.delete(import.meta.env.VITE_API_BASE_URL + `/organizer/AttendeeLists/deleteby:${id}`, { withCredentials: true })
         )
       );
       setLists(prevLists => prevLists.filter(list => !selectedLists.includes(list.Id)));
@@ -536,8 +528,7 @@ const ListsPage = () => {
       setModal({ ...modal, bulkDelete: false });
       setSelectedLists([]);
     } catch (error) {
-      console.error('Failed to delete lists:', error);
-      showSnackbar('Failed to delete some lists.'+ error.response?.data.message || error +' Please try again.', 'error');
+      showSnackbar('Failed to delete some lists.' + error.response?.data.message || error + ' Please try again.', 'error');
     } finally {
       setLoading(false);
       fetchLists(); // Refresh the list after deletion
@@ -548,7 +539,7 @@ const ListsPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        import.meta.env.VITE_API_BASE_URL+`/organizer/AttendeeLists/archive/${id}`,
+        import.meta.env.VITE_API_BASE_URL + `/organizer/AttendeeLists/archive/${id}`,
         archive, // Send the boolean value directly
         {
           withCredentials: true,
@@ -560,14 +551,13 @@ const ListsPage = () => {
       // Update in state
       setLists(prevLists => prevLists.map(list =>
         list.Id === id
-        ? { ...list, IsArchived: archive, LastModifiedDate: new Date().toISOString() }
-        : list
+          ? { ...list, IsArchived: archive, LastModifiedDate: new Date().toISOString() }
+          : list
       ));
-      
+
       showSnackbar(`List ${archive ? 'archived' : 'unarchived'} successfully!`, 'success');
     } catch (error) {
-      console.error(`Failed to ${archive ? 'archive' : 'unarchive'} list:`, error.response?.data.message || error);
-      showSnackbar(`Failed to ${archive ? 'archive' : 'unarchive'} list.` + error.response?.data.message || ` Please try again.`, 'error');
+      showSnackbar(`Failed to ${archive ? 'archive' : 'unarchive'} list.` + error.response?.data.message || error` Please try again.`, 'error');
     } finally {
       setLoading(false);
     }
@@ -578,7 +568,7 @@ const ListsPage = () => {
     try {
       // Call the clone endpoint with the list ID
       const response = await axios.post(
-        import.meta.env.VITE_API_BASE_URL+`/organizer/AttendeeLists/clone/${id}`,
+        import.meta.env.VITE_API_BASE_URL + `/organizer/AttendeeLists/clone/${id}`,
         {}, // Empty body since all data comes from the original list
         { withCredentials: true }
       );
@@ -588,8 +578,7 @@ const ListsPage = () => {
 
       showSnackbar('List cloned successfully!', 'success');
     } catch (error) {
-      console.error('Failed to clone list:', error);
-      showSnackbar('Failed to clone list. Please try again.', 'error');
+      showSnackbar('Failed to clone list. Please try again.' + error, 'error');
     } finally {
       setLoading(false);
     }
@@ -690,7 +679,7 @@ const ListsPage = () => {
     return (
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', p: { xs: 2, md: 4 } }}>
         <LinearProgress sx={{ mb: 4 }} />
-        
+
         <Skeleton variant="rectangular" width="30%" height={40} sx={{ mb: 2, borderRadius: 1 }} />
         <Skeleton variant="rectangular" width="20%" height={20} sx={{ mb: 4, borderRadius: 1 }} />
 
@@ -746,14 +735,14 @@ const ListsPage = () => {
                     {list.IsArchived && (
                       <CardBadge color="warning.main">Archived</CardBadge>
                     )}
-                    
+
                     <CardHeader>
                       <Box>
                         {list.Category && (
-                          <Chip 
-                            size="small" 
-                            label={list.Category} 
-                            color="primary" 
+                          <Chip
+                            size="small"
+                            label={list.Category}
+                            color="primary"
                             variant="outlined"
                             sx={{ mb: 1 }}
                           />
@@ -782,7 +771,7 @@ const ListsPage = () => {
                           )}
                         </Typography>
                       </Box>
-                      
+
                       <Box>
                         <Checkbox
                           checked={selectedLists.includes(list.Id)}
@@ -816,11 +805,11 @@ const ListsPage = () => {
                         </Typography>
                       )}
 
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between', 
-                        mb: 2 
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 2
                       }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <FiUsers size={16} style={{ marginRight: 8, color: theme.palette.primary.main }} />
@@ -918,10 +907,10 @@ const ListsPage = () => {
         <Paper elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
           <TableContainer>
             <Table>
-              <TableHead sx={{ 
-                backgroundColor: theme.palette.mode === 'dark' 
-                  ? alpha(theme.palette.primary.main, 0.7) 
-                  : theme.palette.primary.main 
+              <TableHead sx={{
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.primary.main, 0.7)
+                  : theme.palette.primary.main
               }}>
                 <TableRow>
                   <TableCell padding="checkbox" sx={{ color: 'common.white' }}>
@@ -987,8 +976,8 @@ const ListsPage = () => {
                                 )}
                               </Box>
                               {list.Description && (
-                                <Typography 
-                                  variant="body2" 
+                                <Typography
+                                  variant="body2"
                                   color="text.secondary"
                                   sx={{
                                     maxWidth: '300px',
@@ -1160,7 +1149,7 @@ const ListsPage = () => {
   // Define missing utility functions
   const stringToColor = (string) => {
     if (!string) return '#757575';
-    
+
     let hash = 0;
     let i;
 
@@ -1180,7 +1169,7 @@ const ListsPage = () => {
 
   const getInitials = (name) => {
     if (!name) return '?';
-    
+
     return name
       .split(' ')
       .map(word => word[0])
@@ -1190,8 +1179,8 @@ const ListsPage = () => {
   };
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh', 
+    <Box sx={{
+      minHeight: '100vh',
       bgcolor: 'background.default',
       p: { xs: 2, sm: 3, md: 4 }
     }}>
@@ -1224,7 +1213,7 @@ const ListsPage = () => {
             </Link>
             <Typography color="text.primary">Attendee Lists</Typography>
           </Breadcrumbs>
-          
+
           <PageHeader>
             <Box>
               <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
@@ -1291,7 +1280,7 @@ const ListsPage = () => {
               setSelectedTab(newValue);
               setCurrentPage(1);
             }}
-            sx={{ 
+            sx={{
               mb: 3,
               '& .MuiTabs-indicator': {
                 height: 3,
@@ -1302,18 +1291,18 @@ const ListsPage = () => {
             textColor="primary"
             variant={isMobile ? "fullWidth" : "standard"}
           >
-            <Tab 
-              label="All Lists" 
+            <Tab
+              label="All Lists"
               icon={isMobile ? <FiUsers /> : null}
               iconPosition="start"
             />
-            <Tab 
-              label="Archived Lists" 
+            <Tab
+              label="Archived Lists"
               icon={isMobile ? <FiArchive /> : null}
               iconPosition="start"
             />
-            <Tab 
-              label="Active Lists" 
+            <Tab
+              label="Active Lists"
               icon={isMobile ? <FiCheck /> : null}
               iconPosition="start"
             />
@@ -1325,8 +1314,8 @@ const ListsPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             gap: 2,
             mb: 4
@@ -1434,9 +1423,9 @@ const ListsPage = () => {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button 
-                    variant="outlined" 
-                    color="inherit" 
+                  <Button
+                    variant="outlined"
+                    color="inherit"
                     size="small"
                     onClick={() => {
                       setFilterStatus('all');
@@ -1458,7 +1447,7 @@ const ListsPage = () => {
 
         {filteredLists.length > 0 && pageCount > 1 && (
           <motion.div
-            style={{ 
+            style={{
               display: 'flex',
               justifyContent: 'center',
               marginTop: 32,
@@ -1590,13 +1579,13 @@ const ListsPage = () => {
             Cancel
           </Button>
           <Button
+            onClick={handleCreateList}
             variant="contained"
             color="primary"
-            onClick={handleCreateList}
-            disabled={!formData.name}
-            sx={{ borderRadius: 2 }}
+            disabled={loading} // Use the 'loading' state that's set by handleCreateList
+            startIcon={loading && <CircularProgress size={20} color="inherit" />} // Show loader
           >
-            Create List
+            {loading ? 'Creating...' : 'Create List'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1711,11 +1700,12 @@ const ListsPage = () => {
             variant="contained"
             color="primary"
             onClick={handleEditList}
-            disabled={!editData.name}
+            disabled={!editData.name || loading}
             sx={{ borderRadius: 2 }}
           >
-            Save Changes
+           {loading ? 'Saving...' : 'Save Changes'} 
           </Button>
+        
         </DialogActions>
       </Dialog>
 
@@ -1749,9 +1739,10 @@ const ListsPage = () => {
             onClick={handleDeleteList}
             sx={{ borderRadius: 2 }}
             startIcon={<FiTrash />}
+            disabled={loading}
           >
-            Delete Permanently
-          </Button>
+            {loading ? 'Deleting...' : 'Delete'}
+                      </Button>
         </DialogActions>
       </Dialog>
 
@@ -1785,8 +1776,9 @@ const ListsPage = () => {
             onClick={handleBulkDelete}
             sx={{ borderRadius: 2 }}
             startIcon={<FiTrash />}
+            disabled={loading || selectedLists.length === 0}
           >
-            Delete {selectedLists.length} List(s)
+            {loading ? 'Deleting...' : 'Delete Selected '+ selectedLists.length + ' List(s)'} 
           </Button>
         </DialogActions>
       </Dialog>
@@ -2175,7 +2167,15 @@ const ListsPage = () => {
           )}
         </SpeedDial>
       )}
-
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading} // This state is already used for CRUD operations
+      >
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress color="inherit" />
+          <Typography sx={{ mt: 2 }}>Processing...</Typography>
+        </Box>
+      </Backdrop>
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}

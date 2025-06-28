@@ -10,7 +10,6 @@ import {
   FiUser,
   FiCalendar,
   FiMail,
-  FiSettings,
   FiBell,
   FiHome,
   FiUsers,
@@ -21,10 +20,12 @@ import {
   FiHelpCircle,
   FiCheckCircle,
   FiAlertTriangle,
+  FiPlusSquare
 } from "react-icons/fi"
 import { FcInvite } from "react-icons/fc"
 import { AuthContext } from "../../Contexts/authContext"
 import { motion, AnimatePresence } from "framer-motion"
+import axios from 'axios';
 
 // Confirmation Modal Component
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
@@ -123,9 +124,8 @@ const NavLink = memo(({ to, icon: Icon, label, onClick, badge }) => {
     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
       <Link
         to={to}
-        className={`px-3 py-2 rounded-md text-base font-medium flex items-center gap-2 transition-all duration-300 ${
-          isActive ? "text-blue-600 bg-blue-50" : "text-gray-800 hover:text-blue-600 hover:bg-gray-100"
-        }`}
+        className={`px-3 py-2 rounded-md text-base font-medium flex items-center gap-2 transition-all duration-300 ${isActive ? "text-blue-600 bg-blue-50" : "text-gray-800 hover:text-blue-600 hover:bg-gray-100"
+          }`}
         onClick={onClick}
       >
         {Icon && <Icon className={isActive ? "text-blue-600" : "text-gray-500"} />}
@@ -148,9 +148,8 @@ const MobileNavLink = memo(({ to, icon: Icon, label, onClick, badge }) => {
   return (
     <Link
       to={to}
-      className={`flex items-center justify-center flex-col px-2 py-1 relative ${
-        isActive ? "text-blue-600" : "text-gray-800 hover:text-blue-600"
-      }`}
+      className={`flex items-center justify-center flex-col px-2 py-1 relative ${isActive ? "text-blue-600" : "text-gray-800 hover:text-blue-600"
+        }`}
       onClick={onClick}
     >
       <div className="relative">
@@ -173,6 +172,7 @@ const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [profilePicture, setProfilePicture] = useState(null)
   const menuRef = useRef(null)
   const profileRef = useRef(null)
   const notificationRef = useRef(null)
@@ -184,7 +184,7 @@ const Navbar = () => {
 
   const [userRole, setUserRole] = useState(match ? "attendee" : "organizer") // 'attendee' or 'organizer'
   const [notificationCount, setNotificationCount] = useState(3) // Example notification count
-  
+
   // New state for modals
   const [showRoleSwitchModal, setShowRoleSwitchModal] = useState(false)
   const [pendingRole, setPendingRole] = useState(null)
@@ -192,39 +192,47 @@ const Navbar = () => {
   const [requiredRole, setRequiredRole] = useState("organizer")
   const [pendingNavigation, setPendingNavigation] = useState(null)
 
-  // Sample notifications
-  const notifications = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "New Invitation",
-        message: "You've been invited to Tech Conference 2023",
-        time: "5 min ago",
-        read: false,
-        type: "invitation",
-      },
-      {
-        id: 2,
-        title: "Event Reminder",
-        message: "Marketing Workshop starts in 2 hours",
-        time: "1 hour ago",
-        read: false,
-        type: "reminder",
-      },
-      {
-        id: 3,
-        title: "RSVP Confirmed",
-        message: "Your attendance has been confirmed for Networking Mixer",
-        time: "Yesterday",
-        read: true,
-        type: "confirmation",
-      },
-    ],
-    [],
-  )
+  // Fetch profile picture when user changes
+  // Update the useEffect for fetching profile picture (around line 300):
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        if (user && userRole === "organizer") {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/Profile/profile-picture`,
+            {
+              withCredentials: true,
+              responseType: 'blob'
+            }
+          );
+          const imageUrl = URL.createObjectURL(response.data);
+          setProfilePicture(imageUrl);
+        } else if (attendeeUser && userRole === "attendee") {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/AttendeeProfile/profile-picture`,
+            {
+              withCredentials: true,
+              responseType: 'blob'
+            }
+          );
+          const imageUrl = URL.createObjectURL(response.data);
+          setProfilePicture(imageUrl);
+        }
+      } catch (error) {
+        console.error('Error fetching profile picture:', error);
+        setProfilePicture(null);
+      }
+    };
 
+    fetchProfilePicture();
 
-  
+    return () => {
+      if (profilePicture) {
+        URL.revokeObjectURL(profilePicture);
+      }
+    };
+  }, [user, attendeeUser, userRole]);
+
   // Handle scroll events for navbar appearance
   useEffect(() => {
     const handleScroll = () => {
@@ -249,7 +257,7 @@ const Navbar = () => {
     } else if (userRole === "organizer" && match) {
       navigate("/events-page")
     }
-    else if(userRole === "attendee" && CurrentPath.match(/\/signup/)){
+    else if (userRole === "attendee" && CurrentPath.match(/\/signup/)) {
       setUserRole("organizer")
     }
   }, [userRole, match, navigate])
@@ -297,6 +305,7 @@ const Navbar = () => {
     Logout()
     navigate("/login")
     setShowProfileDropdown(false)
+    setProfilePicture(null); // Clear profile picture on logout
   }
 
   // Handle attendee logout
@@ -331,7 +340,7 @@ const Navbar = () => {
   // Handle role switch with confirmation
   const handleRoleSwitch = (newRole) => {
     if (newRole === userRole) return
-    
+
     setPendingRole(newRole)
     setShowRoleSwitchModal(true)
   }
@@ -364,7 +373,7 @@ const Navbar = () => {
         navigate(path) // Allow navigation to organizer page while in attendee mode
         return
       }
-      
+
       // If not logged in, show login prompt
       if (!user) {
         setPendingNavigation(path)
@@ -373,7 +382,7 @@ const Navbar = () => {
         return
       }
     }
-    
+
     // If user is trying to access attendee features while in organizer mode
     if (requiredUserRole === "attendee" && userRole === "organizer") {
       // If user is logged in as an organizer, allow them to visit attendee pages
@@ -384,7 +393,7 @@ const Navbar = () => {
         navigate(path)
         return
       }
-      
+
       // If not logged in, show login prompt
       if (!attendeeUser) {
         setPendingNavigation(path)
@@ -393,7 +402,7 @@ const Navbar = () => {
         return
       }
     }
-    
+
     // Default case: just navigate
     navigate(path)
   }
@@ -450,38 +459,27 @@ const Navbar = () => {
   }
 
   // Get first letter of name for avatar
+  // Update the getInitial function (around line 1000):
   const getInitial = () => {
     if (userRole === "attendee" && attendeeUser) {
-      return attendeeUser.role?.charAt(0) || attendeeUser.identifier?.charAt(0) || "?"
+      return attendeeUser.firstName?.charAt(0) || attendeeUser.identifier?.charAt(0) || "?";
     } else if (user && userRole === "organizer") {
-      return user.firstName?.charAt(0) || user.email?.charAt(0) || "?"
+      return user.firstName?.charAt(0) || user.email?.charAt(0) || "?";
     }
-    return "?"
-  }
+    return "?";
+  };
 
   // Get display name
+  // Update the getDisplayName function (around line 1010):
   const getDisplayName = () => {
     if (userRole === "attendee" && attendeeUser) {
-      return attendeeUser.identifier?.split("@")[0] || "Login Please"
+      return attendeeUser.firstName || attendeeUser.identifier?.split("@")[0] || "Login Please";
     } else if (user && userRole === "organizer") {
-      return user.firstName || user.email?.split("@")[0] || "Login Please"
+      return user.firstName || user.email?.split("@")[0] || "Login Please";
     }
-    return "Login Please"
-  }
+    return "Login Please";
+  };
 
-  // Get notification icon based on type
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "invitation":
-        return <FiMail className="text-blue-500" />
-      case "reminder":
-        return <FiClock className="text-orange-500" />
-      case "confirmation":
-        return <FiCheckCircle className="text-green-500" />
-      default:
-        return <FiBell className="text-gray-500" />
-    }
-  }
 
   // Mark all notifications as read
   const markAllAsRead = () => {
@@ -504,9 +502,8 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        className={`sticky top-0 w-full z-50 h-16 md:h-20 transition-all duration-300 ${
-          scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-white"
-        }`}
+        className={`sticky top-0 w-full z-50 h-16 md:h-20 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-lg" : "bg-white"
+          }`}
         initial="initial"
         animate="animate"
         variants={navbarVariants}
@@ -532,44 +529,43 @@ const Navbar = () => {
                   <>
                     <NavLink to="/events-page" icon={FiCalendar} label="Events" />
                     <NavLink to="/guestlists" icon={FiUsers} label="Attendees" />
-                    <NavLink to="/create-event" icon={FiPlus} label="Create Event" />
                   </>
                 )}
 
-                {match && attendeeUser && (
+                {/* {match && attendeeUser && (
                   <>
                     <NavLink to="/attendee/events" icon={FiCalendar} label="Events" />
-                    <NavLink to="/invitations" icon={FiMail} label="Invitations" badge={notificationCount} />
-                    <NavLink to="/attendee/discover" icon={FiStar} label="Discover" />
+                    <NavLink to="/attendee/profile" icon={FiUser} label="Profile" />
+                    <NavLink to="/attendee/events/feedback" icon={FiMail} label="Feedbacks" />
+                    <NavLink to="/attendee/qr-scanner" icon={FiMail} label="Scan QR" />
+
                   </>
-                )}
+                )} */}
               </div>
             </div>
 
             {/* Auth Buttons - Desktop */}
             {((userRole === "organizer" && !user) || (userRole === "attendee" && !attendeeUser)) ? (
-              
+
               <div className="hidden md:flex md:items-center md:space-x-4">
                 <div className="flex items-center justify-between mt-3">
-                            <div
-                              className={`text-sm font-medium px-2 py-1 rounded-full ${
-                                userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                              }`}
-                            >
-                              {userRole === "attendee" ? "Attendee" : "Organizer"}
-                            </div>
-                            <button
-                              onClick={() => handleRoleSwitch(userRole === "attendee" ? "organizer" : "attendee")}
-                              className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
-                              style={toggleButtonStyle}
-                            >
-                              <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
-                                  userRole === "organizer" ? "translate-x-6" : "translate-x-1"
-                                }`}
-                              />
-                            </button>
-                          </div>
+                  <div
+                    className={`text-sm font-medium px-2 py-1 rounded-full ${userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                      }`}
+                  >
+                    {userRole === "attendee" ? "Attendee" : "Organizer"}
+                  </div>
+                  <button
+                    onClick={() => handleRoleSwitch(userRole === "attendee" ? "organizer" : "attendee")}
+                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                    style={toggleButtonStyle}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${userRole === "organizer" ? "translate-x-6" : "translate-x-1"
+                        }`}
+                    />
+                  </button>
+                </div>
                 <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                   <Link
                     to={!match ? "/login" : "/attendee/login"}
@@ -580,99 +576,22 @@ const Navbar = () => {
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={{ duration: 0.2 }}>
-                {userRole === "organizer" &&
-                  <Link
-                  to="/signup"
-                  className="flex items-center bg-blue-600 text-white px-6 py-2 rounded-md text-base font-medium shadow-md hover:shadow-lg hover:bg-blue-700 transition-all duration-300"
-                  >
-                    <FiUser className="mr-2" />
-                    Sign Up
-                  </Link>
+                  {userRole === "organizer" &&
+                    <Link
+                      to="/signup"
+                      className="flex items-center bg-blue-600 text-white px-6 py-2 rounded-md text-base font-medium shadow-md hover:shadow-lg hover:bg-blue-700 transition-all duration-300"
+                    >
+                      <FiUser className="mr-2" />
+                      Sign Up
+                    </Link>
                   }
-                  
+
                 </motion.div>
-                
+
               </div>
-              
+
             ) : (
               <div className="hidden md:flex md:items-center md:space-x-4">
-                {/* Notification Bell */}
-                <motion.div whileHover={{ scale: 1.1 }} className="relative" ref={notificationRef}>
-                  <button
-                    onClick={toggleNotifications}
-                    className="relative p-2 text-gray-800 hover:text-blue-600 rounded-full hover:bg-gray-100 transition-colors duration-300"
-                  >
-                    <FiBell size={22} />
-                    {notificationCount > 0 && (
-                      <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white">
-                        {notificationCount}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Notifications Dropdown */}
-                  <AnimatePresence>
-                    {showNotifications && (
-                      <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={dropdownVariants}
-                        className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl overflow-hidden z-50 border border-gray-200"
-                      >
-                        <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                          <h3 className="font-semibold text-gray-800">Notifications</h3>
-                          {notificationCount > 0 && (
-                            <button
-                              onClick={markAllAsRead}
-                              className="text-xs text-blue-600 hover:text-blue-600/80 font-medium"
-                            >
-                              Mark all as read
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="max-h-80 overflow-y-auto">
-                          {notifications.length > 0 ? (
-                            notifications.map((notification) => (
-                              <div
-                                key={notification.id}
-                                className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 ${
-                                  !notification.read ? "bg-blue-50" : ""
-                                }`}
-                              >
-                                <div className="flex items-start">
-                                  <div className="flex-shrink-0 mr-3 mt-1">
-                                    {getNotificationIcon(notification.type)}
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="font-medium text-gray-800">{notification.title}</p>
-                                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                                    <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-6 text-center text-gray-500">
-                              <FiBell className="mx-auto mb-2 text-gray-400" size={24} />
-                              <p>No notifications yet</p>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="p-3 text-center border-t border-gray-100">
-                          <Link
-                            to="/notifications"
-                            className="text-sm text-blue-600 hover:text-blue-600/80 font-medium"
-                          >
-                            View all notifications
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
 
                 {/* User Profile */}
                 <motion.div whileHover={{ scale: 1.05 }} className="relative" ref={profileRef}>
@@ -681,12 +600,20 @@ const Navbar = () => {
                     className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full transition-all duration-300"
                   >
                     <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
-                        {getInitial()}
-                      </div>
+                      {profilePicture ? (
+                        <img
+                          src={profilePicture}
+                          alt="Profile"
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                          {getInitial()}
+                        </div>
+                      )}
                       {((userRole === "organizer" && user) || (userRole === "attendee" && attendeeUser)) &&
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                     }
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                      }
                     </div>
                     <span className="font-medium">{getDisplayName()}</span>
                     <FiChevronDown
@@ -715,9 +642,8 @@ const Navbar = () => {
                           {/* Role Toggle Switch */}
                           <div className="flex items-center justify-between mt-3">
                             <div
-                              className={`text-sm font-medium px-2 py-1 rounded-full ${
-                                userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                              }`}
+                              className={`text-sm font-medium px-2 py-1 rounded-full ${userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                                }`}
                             >
                               {userRole === "attendee" ? "Attendee" : "Organizer"}
                             </div>
@@ -727,21 +653,23 @@ const Navbar = () => {
                               style={toggleButtonStyle}
                             >
                               <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
-                                  userRole === "organizer" ? "translate-x-6" : "translate-x-1"
-                                }`}
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${userRole === "organizer" ? "translate-x-6" : "translate-x-1"
+                                  }`}
                               />
                             </button>
                           </div>
                         </div>
 
                         <div className="py-2">
-                          <Link to="/profile" className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800">
+                          <Link
+                            to={userRole === "attendee" ? "/attendee/profile" : "/profile"}
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                          >
                             <FiUser className="mr-3 text-blue-600" />
                             Your Profile
                           </Link>
                           <Link
-                            to="/events-page"
+                            to={userRole === "attendee" ? "/attendee/events" : "/events-page"}
                             className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
                             onClick={(e) => {
                               e.preventDefault()
@@ -749,25 +677,37 @@ const Navbar = () => {
                             }}
                           >
                             <FiCalendar className="mr-3 text-blue-600" />
-                            Your Events
+                            Events
                           </Link>
-                          {match && (
+                           
+                           {userRole === "attendee" &&(
+                            <>
                             <Link
-                              to="/invitations"
-                              className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                            to="/attendee/events/feedback"
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleNavigation("/attendee/events/feedback", "attendee")
+                            }}
                             >
-                              <FiMail className="mr-3 text-blue-600" />
-                              Invitations
-                              <span className="ml-auto bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                                {notificationCount}
-                              </span>
-                            </Link>
-                          )}
-                          <Link to="/settings" className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800">
-                            <FiSettings className="mr-3 text-blue-600" />
-                            Settings
+                            <FiMail className="mr-3 text-blue-600" />
+                            Feedbacks
                           </Link>
-                          <Link to="/help" className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800">
+                         <Link
+                         to="/attendee/qr-scanner"
+                         className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                         onClick={(e) => {
+                           e.preventDefault()
+                           handleNavigation("/attendee/qr-scanner", "attendee")
+                          }}
+                          >
+                            <FiPlusSquare className="mr-3 text-blue-600" />
+                            Scan QR Code
+                          </Link>
+
+                           </>
+                          )}
+                          <Link to={userRole === "attendee" ? "/attendee/help" : "/help"} className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800">
                             <FiHelpCircle className="mr-3 text-blue-600" />
                             Help & Support
                           </Link>
@@ -811,23 +751,7 @@ const Navbar = () => {
 
             {/* Mobile menu button */}
             <div className="flex items-center md:hidden">
-              {(user || attendeeUser) && (
-                <motion.div whileHover={{ scale: 1.1 }} className="relative mr-4">
-                  <button
-                    onClick={toggleNotifications}
-                    className="relative p-2 text-gray-800 hover:text-blue-600 rounded-full hover:bg-gray-100 transition-colors duration-300"
-                  >
-                    <FiBell size={22} />
-                    {notificationCount > 0 && (
-                      <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white">
-                        {notificationCount}
-                      </span>
-                    )}
-                  </button>
-                </motion.div>
-              )}
-
-              <motion.button
+               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleMenu}
                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-800 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-colors duration-300"
@@ -865,9 +789,17 @@ const Navbar = () => {
                   {(user || attendeeUser) && (
                     <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-blue-600 text-xl font-bold shadow-lg">
-                          {getInitial()}
-                        </div>
+                        {profilePicture ? (
+                          <img
+                            src={profilePicture}
+                            alt="Profile"
+                            className="w-16 h-16 rounded-full object-cover shadow-lg"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-blue-600 text-xl font-bold shadow-lg">
+                            {getInitial()}
+                          </div>
+                        )}
                         <div className="text-white">
                           <p className="font-bold text-xl">{getDisplayName()}</p>
                           {userRole !== "attendee" && user && (
@@ -881,9 +813,8 @@ const Navbar = () => {
                   {/* Role Toggle Switch */}
                   <div className="flex items-center justify-center mt-4 mb-2">
                     <div
-                      className={`text-sm font-medium mr-5 px-2 py-1 rounded-full ${
-                        userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                      }`}
+                      className={`text-sm font-medium mr-5 px-2 py-1 rounded-full ${userRole === "attendee" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
+                        }`}
                     >
                       {userRole === "attendee" ? "Attendee" : "Organizer"}
                     </div>
@@ -893,9 +824,8 @@ const Navbar = () => {
                       style={toggleButtonStyle}
                     >
                       <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
-                          userRole === "organizer" ? "translate-x-6" : "translate-x-1"
-                        }`}
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${userRole === "organizer" ? "translate-x-6" : "translate-x-1"
+                          }`}
                       />
                     </button>
                   </div>
@@ -905,30 +835,41 @@ const Navbar = () => {
                     <div className="flex flex-col space-y-1">
                       {match && attendeeUser && (
                         <div>
+                         
                           <Link
-                            to="/"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
-                          >
-                            <FiHome className="mr-3 text-blue-600" />
-                            Home
-                          </Link>
-                          <Link
-                            to="/attendee/events"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
+                            to="/events-page"
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleNavigation("/events-page", "organizer")
+                            }}
                           >
                             <FiCalendar className="mr-3 text-blue-600" />
                             Events
                           </Link>
-                          <Link
-                            to="/attendee/discover"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
+                            <Link
+                            to="/attendee/events/feedback"
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleNavigation("/attendee/events/feedback", "Attendee")
+                            }}
                           >
-                            <FiStar className="mr-3 text-blue-600" />
-                            Discover
+                            <FiMail className="mr-3 text-blue-600" />
+                            Feedbacks
                           </Link>
+                         <Link
+                            to="/attendee/qr-scanner"
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleNavigation("/attendee/qr-scanner", "Attendee")
+                            }}
+                          >
+                            <FiPlusSquare className="mr-3 text-blue-600" />
+                            Scan QR Code
+                          </Link>
+                          
                         </div>
                       )}
 
@@ -950,14 +891,6 @@ const Navbar = () => {
                             <FiUsers className="mr-3 text-blue-600" />
                             Attendees
                           </Link>
-                          <Link
-                            to="/create-event"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
-                          >
-                            <FiPlus className="mr-3 text-blue-600" />
-                            Create Event
-                          </Link>
                         </div>
                       )}
 
@@ -965,47 +898,14 @@ const Navbar = () => {
                         <>
                           <div className="h-px bg-gray-200 my-2"></div>
 
-                          <Link
-                            to="/profile"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
+                           <Link
+                            to={userRole === "attendee" ? "/attendee/profile" : "/profile"}
+                            className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800"
                           >
                             <FiUser className="mr-3 text-blue-600" />
-                            Profile
+                            Your Profile
                           </Link>
-
-                          {match && attendeeUser && (
-                            <Link
-                              to="/invitations"
-                              className="flex items-center justify-between text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                              onClick={closeMenu}
-                            >
-                              <span className="flex items-center">
-                                <FiMail className="mr-3 text-blue-600" />
-                                Invitations
-                              </span>
-                              {notificationCount > 0 && (
-                                <span className="ml-auto bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                                  {notificationCount}
-                                </span>
-                              )}
-                            </Link>
-                          )}
-
-                          <Link
-                            to="/settings"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
-                          >
-                            <FiSettings className="mr-3 text-blue-600" />
-                            Settings
-                          </Link>
-
-                          <Link
-                            to="/help"
-                            className="flex items-center text-gray-800 hover:text-blue-600 hover:bg-gray-50 px-4 py-3 rounded-md text-lg font-medium transition-colors duration-300"
-                            onClick={closeMenu}
-                          >
+                          <Link to={userRole === "attendee" ? "/attendee/help" : "/help"} className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-800">
                             <FiHelpCircle className="mr-3 text-blue-600" />
                             Help & Support
                           </Link>
@@ -1036,7 +936,7 @@ const Navbar = () => {
                               Login
                             </Link>
                           )}
-                            {!match && !user && (
+                          {!match && !user && (
                             <Link
                               to="/login"
                               className="flex items-center w-full text-left px-4 py-3 hover:bg-gray-50 text-gray-800"
@@ -1093,65 +993,6 @@ const Navbar = () => {
             </>
           )}
         </AnimatePresence>
-
-        {/* Mobile Notifications Panel */}
-        <AnimatePresence>
-          {showNotifications && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden fixed top-16 left-0 right-0 bg-white shadow-lg z-40 max-h-[70vh] overflow-y-auto"
-            >
-              <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="font-semibold text-gray-800">Notifications</h3>
-                {notificationCount > 0 && (
-                  <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:text-blue-600/80 font-medium">
-                    Mark all as read
-                  </button>
-                )}
-              </div>
-
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.length > 0 ? (
-                  notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 ${
-                        !notification.read ? "bg-blue-50" : ""
-                      }`}
-                    >
-                      <div className="flex items-start">
-                        <div className="flex-shrink-0 mr-3 mt-1">{getNotificationIcon(notification.type)}</div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">{notification.title}</p>
-                          <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                          <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-6 text-center text-gray-500">
-                    <FiBell className="mx-auto mb-2 text-gray-400" size={24} />
-                    <p>No notifications yet</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-3 text-center border-t border-gray-100">
-                <Link
-                  to="/notifications"
-                  className="text-sm text-blue-600 hover:text-blue-600/80 font-medium"
-                  onClick={() => setShowNotifications(false)}
-                >
-                  View all notifications
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.nav>
 
       {/* Mobile Bottom Navigation Bar (Eventbrite style) */}
@@ -1166,30 +1007,29 @@ const Navbar = () => {
             {userRole === "attendee" ? (
               // Attendee Bottom Navigation
               <>
-                <MobileNavLink to="/attendee/events" icon={FiHome} label="Home" />
-                <MobileNavLink to="/attendee/discover" icon={FiStar} label="Discover" />
+                <MobileNavLink to="/attendee" icon={FiHome} label="Home" />
+                <MobileNavLink to="/attendee/events" icon={FiCalendar} label="Events" />
                 <div className="-mt-5">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
-                      to="/attendee/events"
+                      to="/attendee/qr-scanner"
                       className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg"
                     >
-                      <FiCalendar size={24} />
+                      <FiPlusSquare size={24} />
                     </Link>
                   </motion.div>
                 </div>
                 <MobileNavLink
-                  to="/invitations"
+                  to="/attendee/events/feedback"
                   icon={FiMail}
-                  label="Invites"
-                  badge={notificationCount > 0 ? notificationCount : null}
+                  label="Feedbacks"
                 />
-                <MobileNavLink to="/profile" icon={FiUser} label="Profile" />
+                <MobileNavLink to="/attendee/profile" icon={FiUser} label="Profile" />
               </>
             ) : (
               // Organizer Bottom Navigation
               <>
-                <MobileNavLink to="/events-page" icon={FiHome} label="Home" />
+                <MobileNavLink to="/dashboard" icon={FiHome} label="Home" />
                 <MobileNavLink to="/guestlists" icon={FiUsers} label="Attendees" />
                 <div className="-mt-5">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -1229,27 +1069,7 @@ const Navbar = () => {
         role={requiredRole}
       />
 
-      <style jsx global>{`
-        :root {
-          --primary: #2563eb;
-          --primary-dark: #1d4ed8;
-          --cta: #2563eb;
-          --text: #1f2937;
-          --background: #ffffff;
-        }
-        
-        /* Fix for content overlapping with bottom navigation */
-        main {
-          padding-bottom: env(safe-area-inset-bottom, 0);
-        }
-        
-        /* Ensure content doesn't get hidden behind the bottom nav */
-        @media (max-width: 768px) {
-          .page-container {
-            padding-bottom: 5rem;
-          }
-        }
-      `}</style>
+     
     </>
   )
 }

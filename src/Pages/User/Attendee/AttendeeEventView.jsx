@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useContext } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   FaCalendarAlt,
@@ -33,17 +33,19 @@ import {
   FaUserCircle,
   FaRegCalendarAlt,
   FaRegStar,
+  FaRegCheckCircle
 } from "react-icons/fa"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import eventService from "../../../Services/eventServices"
 import AttendeeeventViewService from "../../../Services/AttendeeeventViewServices"
 import listService from "../../../Services/listServices"
-import { AuthContext } from "../../../Contexts/authContext"
+import { AuthContext }  from "../../../Contexts/authContext"
 import LocationViewModal from "../../../Components/Global/LocationViewModal"
 import ReactMarkdown from "react-markdown"
-const VITE_API_IMG_BASE_URL = import.meta.env.VITE_API_IMG_BASE_URL; // Replace with your actual API URL
+import feedbackService from "../../../Services/feedbackService"
 
+const VITE_API_IMG_BASE_URL = import.meta.env.VITE_API_IMG_BASE_URL; // Replace with your actual API URL
 // Loader component with improved animation
 const Loader = () => {
   return (
@@ -130,9 +132,8 @@ const ImageGallery = ({ images, onImageClick }) => {
                 e.stopPropagation()
                 setCurrentIndex(index)
               }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
-              }`}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
+                }`}
               aria-label={`Go to image ${index + 1}`}
             />
           ))}
@@ -293,35 +294,158 @@ const AttendeeEventView = () => {
   // Define state variables for conditional logic
   const [canRegister, setCanRegister] = useState(false)
   const [isRegistrationExpired, setIsRegistrationExpired] = useState(false)
-// Add this helper function inside the EventView component
-const extractScheduleFromDescription = (description) => {
-  if (!description) return []
+  const [attendeeRegistrationStatus, setAttendeeRegistrationStatus] = useState(null)
+  const [totalAttendees, setTotalAttendees] = useState(0)
+  const [likeCount, setLikeCount] = useState(0)
+const { attendeeUser } = useContext(AuthContext) || {};
+  const [feedback, setFeedback] = useState([]);
+const [averageRating, setAverageRating] = useState(0);
+const [totalFeedback, setTotalFeedback] = useState(0);
+const [loadingFeedback, setLoadingFeedback] = useState(false);
+const [feedbackError, setFeedbackError] = useState(null);
 
-  // Look for a schedule section in the description
-  const scheduleMatch = description.match(/## Event Schedule\s*\n([\s\S]*?)(\n##|$)/)
+// Add this component inside the EventView component
+const FeedbackSection = () => {
+  if (loadingFeedback) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
-  if (!scheduleMatch) return []
+  if (feedbackError) {
+    return (
+      <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
+        {feedbackError}
+      </div>
+    );
+  }
 
-  // Parse the schedule items
-  const scheduleText = scheduleMatch[1]
-  const scheduleItems = scheduleText
-    .split("\n")
-    .filter((line) => line.trim().startsWith("-"))
-    .map((line) => {
-      // Extract time and activity from format like "- **10:00** - Registration"
-      const match = line.match(/- \*\*(.*?)\*\* - (.*)/)
-      if (match) {
-        return {
-          time: match[1],
-          activity: match[2],
+  if (feedback.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <FaRegStar className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+        <p className="text-gray-500">No feedback yet for this event</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-gray-900">Event Feedback</h3>
+        <div className="flex items-center gap-4">
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Average Rating</p>
+            <div className="flex items-center justify-center">
+              <span className="text-2xl font-bold text-gray-900">
+                {averageRating.toFixed(1)}
+              </span>
+              <span className="text-gray-500 ml-1">/5</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Total Reviews</p>
+            <p className="text-2xl font-bold text-gray-900">{totalFeedback}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {feedback.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: index * 0.05 }}
+            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+          >
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
+                {item.attendeeName?.charAt(0) || "A"}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-gray-900">
+                    {item.attendeeName || "Anonymous"}
+                  </h4>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaRegStar
+                        key={i}
+                        className={`h-4 w-4 ${i < item.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {new Date(item.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                {item.comment && (
+                  <p className="mt-3 text-gray-700">{item.comment}</p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Add this useEffect to fetch feedback data
+useEffect(() => {
+  const fetchFeedback = async () => {
+    try {
+      setLoadingFeedback(true);
+      const feedbackData = await feedbackService.getEventFeedback(id);
+      setFeedback(feedbackData.feedback || []);
+      setAverageRating(feedbackData.stats?.averageRating || 0);
+      setTotalFeedback(feedbackData.stats?.totalFeedback || 0);
+    } catch (err) {
+      setFeedbackError(err.message || "Failed to load feedback");
+      console.error("Error fetching feedback:", err);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
+  fetchFeedback();
+}, [id]);
+  // Add this helper function inside the EventView component
+  const extractScheduleFromDescription = (description) => {
+    if (!description) return []
+
+    // Look for a schedule section in the description
+    const scheduleMatch = description.match(/## Event Schedule\s*\n([\s\S]*?)(\n##|$)/)
+
+    if (!scheduleMatch) return []
+
+    // Parse the schedule items
+    const scheduleText = scheduleMatch[1]
+    const scheduleItems = scheduleText
+      .split("\n")
+      .filter((line) => line.trim().startsWith("-"))
+      .map((line) => {
+        // Extract time and activity from format like "- **10:00** - Registration"
+        const match = line.match(/- \*\*(.*?)\*\* - (.*)/)
+        if (match) {
+          return {
+            time: match[1],
+            activity: match[2],
+          }
         }
-      }
-      return null
-    })
-    .filter((item) => item !== null)
+        return null
+      })
+      .filter((item) => item !== null)
 
-  return scheduleItems
-}
+    return scheduleItems
+  }
   useEffect(() => {
     const fetchEventData = async () => {
       try {
@@ -332,11 +456,20 @@ const extractScheduleFromDescription = (description) => {
           AttendeeeventViewService.getEventById(id),
           AttendeeeventViewService.getEventMedia(id),
         ])
+        const response = await AttendeeeventViewService.checkRegistrationStatus(id);
+        setAttendeeRegistrationStatus(response);
+        console.log(response)
+        const response2 = await AttendeeeventViewService.getEventAttendeeLists(id);
+        console.log(response2)
+        if (response2?.length > 0) {
+          const totalAttendees = await AttendeeeventViewService.getEventAttendeesStatistics(response2[0].Id);
+        setTotalAttendees(totalAttendees.totalAllowedPeople)
 
+              }
         setEvent(eventData) // Assuming API returns array
-console.log(eventData)
-    
-setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
+        console.log(eventData)
+
+        setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
 
         // Process media data
         const processedMedia = {
@@ -348,10 +481,8 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
         if (eventData.registration_expiry) {
           const expiryDate = new Date(eventData.registration_expiry)
           const n = new Date()
-        const now = formatDateTime(n)
-          
-          setIsRegistrationExpired(expiryDate < now)
-          setCanRegister(expiryDate > now)
+          setIsRegistrationExpired(expiryDate < n)
+          setCanRegister(!expiryDate < n)
         } else {
           setCanRegister(true) // If no expiry, registration is always open
         }
@@ -386,21 +517,60 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
     setShowShareModal(true)
   }
 
-  const handleBookmark = async () => {
+const handleSave = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     try {
-      setIsSaved(!isSaved)
-      toast.success(isSaved ? "Event removed from bookmarks" : "Event bookmarked!")
-    } catch (err) {
-      toast.error(err.message || "Failed to bookmark event")
+      // Call API to toggle save status
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/save`, {
+        method: "POST",
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to update saved status")
+      }
+
+      const data = await response.json()
+      setIsSaved(data.isSaved)
+      toast.success(data.isSaved ? "Added to saved events" : "Removed from saved events")
+    } catch (error) {
+      if (error.message.includes("sign in")) {
+        toast.error("Please sign in to save events")
+      } else {
+        toast.error(error.message || "Failed to update saved status")
+      }
     }
   }
 
-  const handleLike = async () => {
+const handleLike = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     try {
-      setIsLiked(!isLiked)
-      toast.success(isLiked ? "Event removed from favorites" : "Event added to favorites!")
-    } catch (err) {
-      toast.error(err.message || "Failed to favorite event")
+      // Call API to toggle like status
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/AttendeeEvents/${event.id}/like`, {
+        method: "POST",
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to update like status")
+      }
+
+      const data = await response.json()
+      setIsLiked(data.isLiked)
+      setLikeCount(data.likeCount)
+      toast.success(data.isLiked ? "Added to liked events" : "Removed from liked events")
+    } catch (error) {
+      if (error.message.includes("sign in")) {
+        toast.error("Please sign in to like events")
+      } else {
+        toast.error(error.message || "Failed to update like status")
+      }
     }
   }
 
@@ -443,7 +613,8 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
   // }
 
   const handleRegister = () => {
-    navigate(`/events/${id}/register`)
+    console.log("Registering for event:", canRegister, isRegistrationExpired)
+    navigate(`/attendee/events/${id}/register`)
   }
 
   if (loading) {
@@ -575,9 +746,8 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                             e.stopPropagation()
                             setCurrentImageIndex(index)
                           }}
-                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                            index === currentImageIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
-                          }`}
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
+                            }`}
                           aria-label={`Go to image ${index + 1}`}
                         />
                       ))}
@@ -634,54 +804,11 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {isOrganizer ? (
-              <>
-                <button
-                  onClick={handleEditEvent}
-                  className="flex items-center px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-medium"
-                >
-                  <FaEdit className="mr-2 h-4 w-4" /> Edit
-                </button>
-                <button
-                  onClick={handleManageEvent}
-                  className="flex items-center px-4 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-sm font-medium"
-                >
-                  <FaCog className="mr-2 h-4 w-4" /> Manage
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleLike}
-                  className={`flex items-center px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                    isLiked
-                      ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
-                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
-                  aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
-                >
-                  {isLiked ? <FaHeart className="mr-2 h-4 w-4" /> : <FaRegHeart className="mr-2 h-4 w-4" />}
-                  {isLiked ? "Liked" : "Like"}
-                </button>
-              </>
-            )}
             <button
               onClick={handleShare}
               className="flex items-center px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
             >
               <FaShareAlt className="mr-2 h-4 w-4" /> Share
-            </button>
-            <button
-              onClick={handleBookmark}
-              className={`flex items-center px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                isSaved
-                  ? "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-              aria-label={isSaved ? "Remove from bookmarks" : "Save to bookmarks"}
-            >
-              {isSaved ? <FaBookmark className="mr-2 h-4 w-4" /> : <FaRegBookmark className="mr-2 h-4 w-4" />}
-              {isSaved ? "Saved" : "Save"}
             </button>
           </div>
         </div>
@@ -763,21 +890,21 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                     <p className="text-gray-900 font-medium">{event.location || "Online"}</p>
                     {event.latitude && event.longitude && (
                       <button className="text-indigo-600 text-sm mt-1 hover:text-indigo-700 hover:underline flex items-center"
-                      onClick={() => {
-                        // Open a map view using the coordinates
-                        setShowLocationView(true)
-                      }}
+                        onClick={() => {
+                          // Open a map view using the coordinates
+                          setShowLocationView(true)
+                        }}
                       >
                         <FaMapMarkedAlt className="mr-1 h-3.5 w-3.5" />
                         View on map
                       </button>
                     )}
-                     {showLocationView && (
-                        <LocationViewModal
-                          onClose={() => setShowLocationView(false)}
-                          initialLngLat={pickedLocation}
-                        />
-                      )}
+                    {showLocationView && (
+                      <LocationViewModal
+                        onClose={() => setShowLocationView(false)}
+                        initialLngLat={pickedLocation}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -818,8 +945,8 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                 )}
               </div>
             </div>
- {/* Event Schedule */}
- {extractScheduleFromDescription(event.description).length > 0 && (
+            {/* Event Schedule */}
+            {extractScheduleFromDescription(event.description).length > 0 && (
               <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
                 <div className="p-6 border-b border-gray-100">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center">
@@ -846,19 +973,19 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
             )}
             {/* Description */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden break-words">
-  <div className="p-6 border-b border-gray-100">
-    <h2 className="text-xl font-bold text-gray-900">Description</h2>
-  </div>
-  <div className="p-6">
-    {event.description ? (
-      <div className="prose max-w-none text-gray-700">
-        <ReactMarkdown>{event.description}</ReactMarkdown>
-      </div>
-    ) : (
-      <p className="text-gray-500 italic">No description provided.</p>
-    )}
-  </div>
-</div>
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900">Description</h2>
+              </div>
+              <div className="p-6">
+                {event.description ? (
+                  <div className="prose max-w-none text-gray-700">
+                    <ReactMarkdown>{event.description}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No description provided.</p>
+                )}
+              </div>
+            </div>
 
 
             {/* Videos */}
@@ -888,19 +1015,20 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                   <div>
                     <h3 className="font-medium text-lg text-gray-900">{event.organizer_name}</h3>
                     <p className="text-gray-600">{event.organizer_email}</p>
-                    <div className="mt-2 flex gap-2">
-                      <button className="text-indigo-600 text-sm hover:text-indigo-700 hover:underline flex items-center">
-                        <FaEnvelope className="mr-1 h-3.5 w-3.5" />
-                        Contact
-                      </button>
-                      <span className="text-gray-300">|</span>
-                      <button className="text-indigo-600 text-sm hover:text-indigo-700 hover:underline flex items-center">
-                        <FaRegStar className="mr-1 h-3.5 w-3.5" />
-                        View profile
-                      </button>
-                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
+                        {/* // Add this after the Organizer info section in the left column */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                  <FaRegStar className="mr-2 h-5 w-5 text-indigo-600" />
+                  Attendee Feedback
+                </h2>
+              </div>
+              <div className="p-6">
+                <FeedbackSection />
               </div>
             </div>
           </div>
@@ -930,24 +1058,11 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                         <FaUserFriends className="mr-2 h-4 w-4" />
                         View Attendees
                       </button>
-                      <button
-                        onClick={() => navigate(`/events/${id}/analytics`)}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center"
-                      >
-                        <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                        View Analytics
-                      </button>
+                  
                     </>
                   ) : (
                     <>
-                      {isRegistrationExpired ? (
+                      {isRegistrationExpired && !(attendeeRegistrationStatus.isPaid || (attendeeRegistrationStatus.isConfirmed && event.ticket_type === "free")) ? (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                           <p className="text-red-700 font-medium">Registration closed</p>
                           <p className="text-red-600 text-sm mt-1">
@@ -956,6 +1071,7 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                         </div>
                       ) : (
                         <>
+                          {isRegistrationExpired && <p className="text-red-700 font-medium">Registration closed on {formatDate(event.registration_expiry)}</p>}
                           {event.ticket_type === "paid" ? (
                             <div className="mb-6">
                               <p className="text-3xl font-bold text-gray-900 mb-1">
@@ -970,23 +1086,97 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                             </div>
                           )}
 
+                                  {attendeeUser ? (
+                                    <>
+                          {/* Dynamic Registration Message */}
+                          {attendeeRegistrationStatus.isRegistered && attendeeRegistrationStatus.isInvited ? (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                              <p className="text-green-700 font-medium">You are registered for this event!</p>
+                              <p className="text-green-600 text-sm mt-1">
+                                {attendeeRegistrationStatus.isInvited
+                                  ? "You have been invited to this event."
+                                  : "You are registered for this event."}
+                                {attendeeRegistrationStatus.isConfirmed
+                                  ? "Your registration is confirmed."
+                                  : "Please check your email for confirmation details."}
+
+                                {attendeeRegistrationStatus.isPaid && event.ticket_type === "paid"
+                                  ? " Your payment has been received."
+                                  : " Payment is required to confirm your registration."}
+                              </p>
+                            </div>
+                          ) : canRegister ? (
+                            <p className="text-gray-500 mb-4">
+                              Click the button below to register for this event.
+                            </p>
+                          ) : (
+                            <p className="text-gray-500 mb-4">
+                              Registration not currently available.
+                            </p>
+                          )}
+                          {/* Registration Button */}
                           <button
-                            onClick={handleRegister}
+                            onClick={() =>
+                              handleRegister()
+                            }
+                            disabled={isRegistrationExpired && !(attendeeRegistrationStatus.isPaid || (attendeeRegistrationStatus.isConfirmed && event.ticket_type === "free"))}
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3.5 px-4 rounded-lg transition-colors shadow-sm mb-4"
                           >
-                            Register Now
+                            <span className="flex items-center justify-center">
+                              <FaRegCheckCircle className="mr-2 h-4 w-4" />
+                              {attendeeRegistrationStatus.isRegistered && attendeeRegistrationStatus.isConfirmed && attendeeRegistrationStatus.isPaid ? "Registered" : ""}
+                              {attendeeRegistrationStatus.isRegistered && attendeeRegistrationStatus.isConfirmed && event.ticket_type === "free" ? "Registered" : ""}
+                              {attendeeRegistrationStatus.isRegistered && attendeeRegistrationStatus.isInvited && !attendeeRegistrationStatus.isConfirmed && !attendeeRegistrationStatus.isPaid ? "Confirm Registration" : ""}
+                              {attendeeRegistrationStatus.isRegistered && !attendeeRegistrationStatus.isInvited && !attendeeRegistrationStatus.isConfirmed && !attendeeRegistrationStatus.isPaid ? "Register" : ""}
+                              {attendeeRegistrationStatus.isRegistered && attendeeRegistrationStatus.isConfirmed && !attendeeRegistrationStatus.isPaid && event.ticket_type === "paid" ? "Confirm Payment" : ""}
+                              {!attendeeRegistrationStatus.isRegistered && canRegister ? "Register Now" : ""}
+                              {!attendeeRegistrationStatus.isRegistered && canRegister && totalAttendees >= event.capacity ? "Registration Closed - Event Full" : ""}
+                              {!attendeeRegistrationStatus.isRegistered && !canRegister ? "Registration Closed" : ""}
+                            </span>
                           </button>
+                            </>
+                          
+                            ) : (
+                              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                                <p className="text-gray-700 font-medium">No User Found</p>
+                                <p className="text-gray-600 text-sm mt-1">
+                                  Please log in to register for this event.
+                                  <button>
+                                    <Link to="/attendee/login" className="text-indigo-600 hover:underline ml-1">
+                                      Log In
+                                    </Link>
+                                  </button>
+                                </p>
+                              </div>
+                            )
+                          
+                          }
+
+
+
 
                           <div className="text-center text-sm text-gray-500">
-                            {event.capacity ? (
+
+                          {event.capacity - totalAttendees < 0 && (
+                            <p className="flex items-center justify-center">
+                              <FaUsers className="mr-1.5 h-4 w-4 text-gray-400" />
+                              <p className="ml-1 text-gray-500">{-(event.capacity - totalAttendees)} Extra Attendees Added By Organizer</p>
+                            </p>
+                          )}
+                          </div>
+                          {/* Capacity */}
+                          <div className="text-center text-sm text-gray-500">
+                            {event.capacity - totalAttendees < 0 ? (
                               <p className="flex items-center justify-center">
                                 <FaUsers className="mr-1.5 h-4 w-4 text-gray-400" />
-                                {event.capacity} spots available
+                                Total 0 out of {event.capacity} spots available
+                                {totalAttendees >= event.capacity ? " - Event Full" : ""}
                               </p>
                             ) : (
                               <p className="flex items-center justify-center">
                                 <FaUsers className="mr-1.5 h-4 w-4 text-gray-400" />
-                                Unlimited spots available
+                                Total {event.capacity - totalAttendees} out of {event.capacity} spots available
+                                {totalAttendees >= event.capacity ? " - Event Full" : ""}
                               </p>
                             )}
                           </div>
@@ -996,6 +1186,8 @@ setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
                   )}
                 </div>
               </motion.div>
+
+
 
               {/* Additional info card */}
               <motion.div

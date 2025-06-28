@@ -70,6 +70,7 @@ import {
 } from "@mui/icons-material"
 import eventService from "../../../Services/eventServices"
 import listService from "../../../Services/listServices"
+import eventViewService from "../../../Services/eventViewServices"
 
 // Message templates
 const MESSAGE_TEMPLATES = [
@@ -151,7 +152,8 @@ const SendInvitesPage = () => {
   const [refreshing, setRefreshing] = useState(false)
 
   // Update the getInviteFullMessage function to properly access event details
-  const getInviteFullMessage = () => {
+  const getInviteFullMessage = (attendee) => {
+
     if (!eventDetails) return message
 
     // Format date nicely if available
@@ -179,8 +181,8 @@ const SendInvitesPage = () => {
       }
     }
     // Generate the invite link with event details
-    const inviteLink = `${window.location.origin}/event/${eventId}/invite/${attendees.length > 0 ? attendees[0].Phone : ""}`
-console.log(inviteLink)
+   const inviteLink = `${window.location.origin}/attendee/event/${eventId}/invite/${attendee?.Phone || ""}`
+
     // Append event details and link to the user's message
     return `${message}
 
@@ -188,7 +190,7 @@ console.log(inviteLink)
 Event: ${eventDetails?.title || "Your Event"}
 Date: ${formattedDate}${formattedTime}
 Location: ${eventDetails?.location || "TBD"}
-${eventDetails?.description ? `\nDescription: ${eventDetails.description.substring(0, 100)}${eventDetails.description.length > 100 ? "..." : ""}` : ""}
+${eventDetails?.description ? `\nDescription: ${eventDetails.description.substring(0, 100)}${eventDetails.description.length > 256 ? "..." : ""}` : ""}
 
 RSVP Link: ${inviteLink}
 `
@@ -196,7 +198,8 @@ RSVP Link: ${inviteLink}
 
   // SMS character count
   const smsCharCount = useMemo(() => {
-    const fullMessage = getInviteFullMessage()
+    const fullMessage = getInviteFullMessage(null)
+
     return fullMessage ? fullMessage.length : 0
   }, [message, eventDetails])
 
@@ -224,16 +227,14 @@ RSVP Link: ${inviteLink}
 
       // Fetch event details
       const event = await eventService.getEventById(eventId)
-      console.log("Fetched event details:", event)
 
       // Fix: Check if event is an array and extract the first item
       if (Array.isArray(event) && event.length > 0) {
         setEventDetails(event[0])
-        console.log("Using event details:", event[0])
       } else {
         setEventDetails(event)
       }
-
+setMessage(getDefaultMessage()); 
       // Fetch all available lists for the user
       const allLists = await eventService.getEventAttendeeLists(eventId)
       setLists(allLists.filter((list) => !list.isArchived))
@@ -270,11 +271,6 @@ RSVP Link: ${inviteLink}
         setAttendees([])
         setFilteredAttendees([])
       }
-
-      // Set default message after event details are loaded
-      setTimeout(() => {
-        setMessage(getDefaultMessage())
-      }, 100)
     } catch (error) {
       console.error("Error fetching data:", error)
       showSnackbar("Failed to load data", "error")
@@ -345,7 +341,7 @@ RSVP Link: ${inviteLink}
 
   const getPreviewMessage = (attendee) => {
     // Get the full message with event details and link
-    const fullMessage = getInviteFullMessage()
+    const fullMessage = getInviteFullMessage(attendee)
 
     // Personalize with attendee name if available
     if (attendee) {
@@ -370,74 +366,110 @@ RSVP Link: ${inviteLink}
     showSnackbar("Invite link copied to clipboard", "success")
   }
 
-  const handleSendInvites = async (method) => {
-    if (selectedAttendees.length === 0) {
-      showSnackbar("Please select at least one attendee", "warning")
-      return
-    }
-
-    if (!message.trim()) {
-      showSnackbar("Please enter a message", "warning")
-      return
-    }
-
-    try {
-      setSending(true)
-      const selected = attendees.filter((a) => selectedAttendees.includes(a.Id))
-
-      // Filter attendees based on contact method availability
-      const validAttendees = selected.filter((attendee) =>
-        method === "email"
-          ? attendee.Email && attendee.Email.trim() !== ""
-          : attendee.Phone && attendee.Phone.trim() !== "",
-      )
-
-      if (validAttendees.length === 0) {
-        showSnackbar(
-          `No selected attendees have ${method === "email" ? "email addresses" : "phone numbers"}`,
-          "warning",
-        )
-        setSending(false)
-        return
-      }
-
-      // Send invites with personalized messages
-      const responses = await Promise.all(
-        validAttendees.map((attendee) => {
-          // Personalize message for each attendee
-          const personalMessage = message.replace("Hi there,", `Hi ${attendee.FirstName},`)
-
-          // Get the full message with event details and link
-          const fullMessage = getInviteFullMessage().replace("Hi there,", `Hi ${attendee.FirstName},`)
-
-          if (method === "email") {
-            return listService.sendEmailInvite(eventId, attendee.Id, fullMessage)
-          } else {
-            // Format phone number for SMS
-            const formattedPhone = formatPhoneNumber(attendee.Phone)
-            console.log(`Formatting phone: ${attendee.Phone} → ${formattedPhone}`)
-            // Use the formatted phone number in your service
-            return listService.sendSmsInvite(eventId, attendee.Id, fullMessage, formattedPhone)
-          }
-          
-        }),
-      )
-
-      const successCount = responses.filter((r) => r && r.success).length
-      
-      showSnackbar(`Successfully sent ${successCount} ${method === "email" ? "email" : "SMS"} invites`, "success")
-
-      // Clear selection after successful send
-      setSelectedAttendees([])
-      setActiveStep(0) // Reset stepper
-    } catch (error) {
-      console.error("Error sending invites:", error)
-      showSnackbar("Failed to send invites", "error")
-    } finally {
-      setSending(false)
-      setConfirmSendOpen(false)
-    }
+ const handleSendInvites = async (method) => {
+  if (selectedAttendees.length === 0) {
+    showSnackbar("Please select at least one attendee", "warning");
+    return;
   }
+
+  if (!message.trim()) {
+    showSnackbar("Please enter a message", "warning");
+    return;
+  }
+
+  try {
+    setSending(true);
+    const selected = attendees.filter((a) => selectedAttendees.includes(a.Id));
+
+
+    // Filter attendees based on contact method availability
+    const validAttendees = selected.filter((attendee) =>
+      method === "email"
+        ? attendee.Email && attendee.Email.trim() !== ""
+        : attendee.Phone && attendee.Phone.trim() !== "",
+    );
+
+    if (validAttendees.length === 0) {
+      showSnackbar(
+        `No selected attendees have ${
+          method === "email" ? "email addresses" : "phone numbers"
+        }`,
+        "warning",
+      );
+      setSending(false);
+      return;
+    }
+
+    // Array to store individual responses
+    const responses = [];
+    let successCount = 0;
+
+    // Send invites sequentially
+    for (const attendee of validAttendees) {
+      try {
+        // Personalize message for each attendee
+        const fullMessage = getInviteFullMessage(attendee).replace(
+          "Hi there,",
+          `Hi ${attendee.FirstName},`,
+        );
+        console.log(`Sending invite to ${attendee.FirstName} (${attendee.Id}) via ${method}:`, fullMessage);
+        let response;
+        if (method === "email") {
+          response = await listService.sendEmailInvite(
+            eventId,
+            attendee.Id,
+            fullMessage,
+          );
+        } else {
+          // Format phone number for SMS
+          const formattedPhone = formatPhoneNumber(attendee.Phone);
+          // Use the formatted phone number in your service
+          response = await listService.sendSmsInvite(
+            eventId,
+            attendee.Id,
+            fullMessage,
+            formattedPhone,
+          );
+        }
+        responses.push(response);
+        if (response && response.message.includes("successfully")) {
+          successCount++;
+          // Optional: Show a snackbar for each successful send, or update progress
+          await eventViewService.markAsInvited(eventId, attendee.Id);
+          showSnackbar(`Sent invite to ${attendee.FirstName} ${method}`, "info");
+        }
+      } catch (individualError) {
+        console.error(
+          `Error sending invite to ${attendee.FirstName} (${attendee.Id}):`,
+          individualError,
+        );
+        // Even if one fails, we continue with the others
+        responses.push({
+          status: "failed",
+          error: individualError.message || "Unknown error",
+        });
+      }
+    }
+
+
+    showSnackbar(
+      `Successfully sent ${successCount} ${
+        method === "email" ? "email" : "SMS"
+      } invites out of ${validAttendees.length}`,
+      "success",
+    );
+
+    // Clear selection after successful send
+    setSelectedAttendees([]);
+    setActiveStep(0); // Reset stepper
+  } catch (error) {
+    console.error("Error sending invites:", error);
+    showSnackbar("Failed to send invites", "error");
+  } finally {
+    setSending(false);
+    setConfirmSendOpen(false);
+  }
+};
 
   const handleSendListInvites = async (method) => {
     if (!selectedList) {
@@ -453,7 +485,7 @@ RSVP Link: ${inviteLink}
     try {
       setSending(true)
 
-      const fullMessage = getInviteFullMessage()
+      const fullMessage = getInviteFullMessage(attendee)
 
       let response
       if (method === "email") {
@@ -461,7 +493,6 @@ RSVP Link: ${inviteLink}
       } else {
         // For SMS, pass a flag or parameter indicating phone numbers should be formatted
         response = await listService.sendListInvites(eventId, selectedList, fullMessage, method, true)
-        console.log("Sending SMS with formatted phone numbers (+92 instead of leading 0)")
       }
 
       if (response && response.count) {
@@ -1012,7 +1043,7 @@ RSVP Link: ${inviteLink}
                 <Chip
                   icon={<EmailIcon fontSize="small" />}
                   label={`${stats.withEmail}`}
-                  size="small"
+                  size="medium"
                   color={filter === "email" ? "primary" : "default"}
                   onClick={() => handleFilterChange(filter === "email" ? "all" : "email")}
                   clickable
@@ -1023,7 +1054,7 @@ RSVP Link: ${inviteLink}
                 <Chip
                   icon={<PhoneIcon fontSize="small" />}
                   label={`${stats.withPhone}`}
-                  size="small"
+                  size="medium"
                   color={filter === "sms" ? "primary" : "default"}
                   onClick={() => handleFilterChange(filter === "sms" ? "all" : "sms")}
                   clickable
@@ -1340,20 +1371,16 @@ RSVP Link: ${inviteLink}
                 icon={<PeopleIcon />}
                 iconPosition={isSmall ? "top" : "start"}
               />
-              <Tab
-                label={isSmall ? "List" : "Entire List"}
-                icon={<FilterListIcon />}
-                iconPosition={isSmall ? "top" : "start"}
-              />
             </Tabs>
 
             {tabValue === 0 && (
               <>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Typography variant="subtitle1" fontWeight="500">
-                    Send to {selectedAttendees.length} Selected Attendees
+                    Send to 
+                  <Badge badgeContent={selectedAttendees.length} color="primary" sx={{ mx:2  }} />
+                    Selected Attendees
                   </Typography>
-                  <Badge badgeContent={selectedAttendees.length} color="primary" sx={{ ml: 1 }} />
                 </Box>
 
                 <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -1391,63 +1418,7 @@ RSVP Link: ${inviteLink}
               </>
             )}
 
-            {tabValue === 1 && (
-              <>
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                  <InputLabel id="list-select-label">Select a list</InputLabel>
-                  <Select
-                    labelId="list-select-label"
-                    value={selectedList}
-                    onChange={(e) => setSelectedList(e.target.value)}
-                    label="Select a list"
-                  >
-                    {lists.length === 0 ? (
-                      <MenuItem disabled>No lists available</MenuItem>
-                    ) : (
-                      lists.map((list) => (
-                        <MenuItem key={list.Id} value={list.Id}>
-                          {list.Name} 
-                        </MenuItem>
-                      ))
-                    )}
-                  </Select>
-                </FormControl>
-
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={<EmailIcon />}
-                    onClick={() => handleConfirmSend("email")}
-                    disabled={sending || !selectedList || !message.trim()}
-                    fullWidth
-                    color="primary"
-                    size="large"
-                    sx={{ py: 1.5, borderRadius: 2 }}
-                  >
-                    {sending ? <CircularProgress size={24} /> : "Email List"}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<PhoneIcon />}
-                    onClick={() => handleConfirmSend("sms")}
-                    disabled={sending || !selectedList || !message.trim()}
-                    fullWidth
-                    color="secondary"
-                    size="large"
-                    sx={{ py: 1.5, borderRadius: 2 }}
-                  >
-                    {sending ? <CircularProgress size={24} /> : "SMS List"}
-                  </Button>
-                </Box>
-
-                {!selectedList && (
-                  <Alert severity="info" sx={{ mt: 2 }} icon={<InfoIcon />} variant="outlined">
-                    Please select a list to send bulk invites
-                  </Alert>
-                )}
-              </>
-            )}
-          </Paper>
+              </Paper>
 
           {/* Help Card */}
           <Paper

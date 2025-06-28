@@ -33,7 +33,7 @@ import {
   FaUserCircle,
   FaRegCalendarAlt,
   FaRegStar,
-  FaSearch ,
+  FaSearch,
 } from "react-icons/fa"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
@@ -43,6 +43,7 @@ import listService from "../../../Services/listServices"
 import { AuthContext } from "../../../Contexts/authContext"
 import LocationViewModal from "../../../Components/Global/LocationViewModal"
 import ReactMarkdown from 'react-markdown';
+import feedbackService from "../../../Services/feedbackService"
 
 const VITE_API_IMG_BASE_URL = import.meta.env.VITE_API_IMG_BASE_URL; // Replace with your actual API URL
 
@@ -117,9 +118,8 @@ const ImageGallery = ({ images, onImageClick }) => {
                 e.stopPropagation()
                 setCurrentIndex(index)
               }}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
-              }`}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
+                }`}
               aria-label={`Go to image ${index + 1}`}
             />
           ))}
@@ -276,24 +276,25 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!isOpen || !event) return;
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         // Get all attendee lists attached to this event
         const lists = await eventViewService.getEventAttendeeLists(event.id);
         setAllLists(lists);
-        
+
         if (!lists || lists.length === 0) {
           setAttendees([]);
           return;
         }
-    
+
         // For each list, get the attendees
         const allAttendees = [];
         for (const list of lists) {
-          const listAttendees = await listService.getListAttendees(list.Id);
+          const listAttendees = await listService.getAttachedListAttendees(list.Id);
+          console.log(listAttendees);
           // Add event-specific status information
           const attendeesWithStatus = await Promise.all(
             listAttendees.map(async (attendee) => {
@@ -320,9 +321,9 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
           );
           allAttendees.push(...attendeesWithStatus);
         }
-        
+
         setAttendees(allAttendees);
-        
+
         // Get all available attendees from all lists
         const allAvailableAttendees = [];
         for (const list of lists) {
@@ -361,10 +362,10 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
   const updateAttendeeStatus = async (attendeeId, field, value) => {
     try {
       setIsLoading(true);
-      
+
       let endpoint = '';
       let action = '';
-      
+
       switch (field) {
         case 'isInvited':
           endpoint = 'invite';
@@ -427,11 +428,11 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
 
   const handleAddAttendee = async () => {
     if (!selectedAttendeeToAdd) return;
-    
+
     try {
       setIsLoading(true);
       await eventViewService.addIndividualAttendee(event.id, selectedAttendeeToAdd.Id);
-      
+
       // Get the attendee details
       const newAttendee = availableAttendees.find(a => a.Id === selectedAttendeeToAdd.Id);
       if (newAttendee) {
@@ -443,7 +444,7 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
           isPaid: false
         }]);
       }
-      
+
       setShowAddAttendeeModal(false);
       setSelectedAttendeeToAdd(null);
     } catch (err) {
@@ -485,30 +486,30 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
 
   const StatusDropdown = ({ attendee }) => {
     const [status, setStatus] = useState(attendee.status);
-    
+
     const handleStatusChange = async (newStatus) => {
       setStatus(newStatus);
-      
+
       const updates = {
         isInvited: newStatus === "invited" || newStatus === "confirmed" || newStatus === "paid",
         isConfirmed: newStatus === "confirmed" || newStatus === "paid",
         isPaid: newStatus === "paid"
       };
-      
+
       try {
         setIsLoading(true);
-        
+
         // First reset all statuses
         await eventViewService.removeAttendee(event.id, attendee.Id);
         await eventViewService.addIndividualAttendee(event.id, attendee.Id);
-        
+
         // Then apply the new status
         if (updates.isInvited) await eventViewService.markAsInvited(event.id, attendee.Id);
         if (updates.isConfirmed) await eventViewService.markAsConfirmed(event.id, attendee.Id);
         if (updates.isPaid) await eventViewService.markAsPaid(event.id, attendee.Id);
-        
+
         // Update local state
-        setAttendees(attendees.map(a => 
+        setAttendees(attendees.map(a =>
           a.Id === attendee.Id ? { ...a, ...updates, status: newStatus } : a
         ));
       } catch (err) {
@@ -611,52 +612,47 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
             <div className="flex space-x-1 border-b border-gray-200 mb-4">
               <button
                 onClick={() => setSelectedTab("all")}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  selectedTab === "all"
+                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${selectedTab === "all"
                     ? "border-indigo-600 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 All
               </button>
               <button
                 onClick={() => setSelectedTab("pending")}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  selectedTab === "pending"
+                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${selectedTab === "pending"
                     ? "border-indigo-600 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 Pending
               </button>
               <button
                 onClick={() => setSelectedTab("invited")}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  selectedTab === "invited"
+                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${selectedTab === "invited"
                     ? "border-indigo-600 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 Invited
               </button>
               <button
                 onClick={() => setSelectedTab("confirmed")}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                  selectedTab === "confirmed"
+                className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${selectedTab === "confirmed"
                     ? "border-indigo-600 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 Confirmed
               </button>
               {event.ticket_type === 'paid' && (
                 <button
                   onClick={() => setSelectedTab("paid")}
-                  className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                    selectedTab === "paid"
+                  className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${selectedTab === "paid"
                       ? "border-indigo-600 text-indigo-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
+                    }`}
                 >
                   Paid
                 </button>
@@ -721,7 +717,7 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
 
                   <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
                     <StatusDropdown attendee={attendee} />
-                    
+
                     <button
                       onClick={() => handleRemoveAttendee(attendee.Id)}
                       disabled={isLoading}
@@ -823,11 +819,10 @@ const AttendeeListModal = ({ isOpen, onClose, event }) => {
                   <button
                     onClick={handleAddAttendee}
                     disabled={!selectedAttendeeToAdd || isLoading}
-                    className={`px-4 py-2 rounded-lg text-white transition-colors ${
-                      !selectedAttendeeToAdd || isLoading
+                    className={`px-4 py-2 rounded-lg text-white transition-colors ${!selectedAttendeeToAdd || isLoading
                         ? 'bg-indigo-400 cursor-not-allowed'
                         : 'bg-indigo-600 hover:bg-indigo-700'
-                    }`}
+                      }`}
                   >
                     {isLoading ? 'Adding...' : 'Add Attendee'}
                   </button>
@@ -856,40 +851,162 @@ const EventView = () => {
   const [showAttendeeModal, setShowAttendeeModal] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
- const [showLocationView, setShowLocationView] = useState(false)
+  const [showLocationView, setShowLocationView] = useState(false)
   const [pickedLocation, setPickedLocation] = useState({ lng: 67.0011, lat: 24.8607 })
   // Define state variables for conditional logic
   const [canRegister, setCanRegister] = useState(false)
   const [isRegistrationExpired, setIsRegistrationExpired] = useState(false)
-// Add this helper function inside the EventView component
-const extractScheduleFromDescription = (description) => {
-  if (!description) return []
+  // Add this helper function inside the EventView component
 
-  // Look for a schedule section in the description
-  const scheduleMatch = description.match(/## Event Schedule\s*\n([\s\S]*?)(\n##|$)/)
+  // Add to the existing state declarations
+const [feedback, setFeedback] = useState([]);
+const [averageRating, setAverageRating] = useState(0);
+const [totalFeedback, setTotalFeedback] = useState(0);
+const [loadingFeedback, setLoadingFeedback] = useState(false);
+const [feedbackError, setFeedbackError] = useState(null);
 
-  if (!scheduleMatch) return []
+// Add this component inside the EventView component
+const FeedbackSection = () => {
+  if (loadingFeedback) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
 
-  // Parse the schedule items
-  const scheduleText = scheduleMatch[1]
-  const scheduleItems = scheduleText
-    .split("\n")
-    .filter((line) => line.trim().startsWith("-"))
-    .map((line) => {
-      // Extract time and activity from format like "- **10:00** - Registration"
-      const match = line.match(/- \*\*(.*?)\*\* - (.*)/)
-      if (match) {
-        return {
-          time: match[1],
-          activity: match[2],
+  if (feedbackError) {
+    return (
+      <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
+        {feedbackError}
+      </div>
+    );
+  }
+
+  if (feedback.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <FaRegStar className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+        <p className="text-gray-500">No feedback yet for this event</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-gray-900">Event Feedback</h3>
+        <div className="flex items-center gap-4">
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Average Rating</p>
+            <div className="flex items-center justify-center">
+              <span className="text-2xl font-bold text-gray-900">
+                {averageRating.toFixed(1)}
+              </span>
+              <span className="text-gray-500 ml-1">/5</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-500">Total Reviews</p>
+            <p className="text-2xl font-bold text-gray-900">{totalFeedback}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {feedback.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: index * 0.05 }}
+            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100"
+          >
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
+                {item.attendeeName?.charAt(0) || "A"}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-gray-900">
+                    {item.attendeeName || "Anonymous"}
+                  </h4>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaRegStar
+                        key={i}
+                        className={`h-4 w-4 ${i < item.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  {new Date(item.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                {item.comment && (
+                  <p className="mt-3 text-gray-700">{item.comment}</p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Add this useEffect to fetch feedback data
+useEffect(() => {
+  const fetchFeedback = async () => {
+    try {
+      setLoadingFeedback(true);
+      const feedbackData = await feedbackService.getEventFeedback(id);
+      setFeedback(feedbackData.feedback || []);
+      setAverageRating(feedbackData.stats?.averageRating || 0);
+      setTotalFeedback(feedbackData.stats?.totalFeedback || 0);
+    } catch (err) {
+      setFeedbackError(err.message || "Failed to load feedback");
+      console.error("Error fetching feedback:", err);
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
+  fetchFeedback();
+}, [id]);
+
+  const extractScheduleFromDescription = (description) => {
+    if (!description) return []
+
+    // Look for a schedule section in the description
+    const scheduleMatch = description.match(/## Event Schedule\s*\n([\s\S]*?)(\n##|$)/)
+
+    if (!scheduleMatch) return []
+
+    // Parse the schedule items
+    const scheduleText = scheduleMatch[1]
+    const scheduleItems = scheduleText
+      .split("\n")
+      .filter((line) => line.trim().startsWith("-"))
+      .map((line) => {
+        // Extract time and activity from format like "- **10:00** - Registration"
+        const match = line.match(/- \*\*(.*?)\*\* - (.*)/)
+        if (match) {
+          return {
+            time: match[1],
+            activity: match[2],
+          }
         }
-      }
-      return null
-    })
-    .filter((item) => item !== null)
+        return null
+      })
+      .filter((item) => item !== null)
 
-  return scheduleItems
-}
+    return scheduleItems
+  }
   useEffect(() => {
     const fetchEventData = async () => {
       try {
@@ -902,14 +1019,14 @@ const extractScheduleFromDescription = (description) => {
         ])
 
         setEvent(eventData[0]) // Assuming API returns array
-console.log("helling",eventData[0])
+        console.log("helling", eventData[0])
         // Check if current user is the organizer
         if (user && eventData[0] && user.id === eventData[0].organizer_id) {
           setIsOrganizer(true)
         }
 
 
-      setPickedLocation({ lng: eventData[0].longitude, lat: eventData[0].latitude })
+        setPickedLocation({ lng: eventData[0].longitude, lat: eventData[0].latitude })
 
         // Process media data
         const processedMedia = {
@@ -957,16 +1074,6 @@ console.log("helling",eventData[0])
   const handleShare = () => {
     setShowShareModal(true)
   }
-
-  const handleBookmark = async () => {
-    try {
-      setIsSaved(!isSaved)
-      toast.success(isSaved ? "Event removed from bookmarks" : "Event bookmarked!")
-    } catch (err) {
-      toast.error(err.message || "Failed to bookmark event")
-    }
-  }
-
   const handleLike = async () => {
     try {
       setIsLiked(!isLiked)
@@ -1007,10 +1114,18 @@ console.log("helling",eventData[0])
   }
 
   const handleManageEvent = () => {
-    navigate(`/events/manage/${id}`)
+    navigate(`/events/${id}/monitoring`)
   }
 
-  const handleViewAttendees = () => {
+/*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Handle click event for viewing attendees of the event
+   * @function
+   * @param {void} - No parameters
+   * @return {void} - Sets showAttendeeModal state to true
+   */
+/*******  0edec778-9992-40ef-a10b-e805d28ae276  *******/  
+const handleViewAttendees = () => {
     setShowAttendeeModal(true)
   }
 
@@ -1147,9 +1262,8 @@ console.log("helling",eventData[0])
                             e.stopPropagation()
                             setCurrentImageIndex(index)
                           }}
-                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                            index === currentImageIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
-                          }`}
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white w-6" : "bg-white/60 hover:bg-white/80"
+                            }`}
                           aria-label={`Go to image ${index + 1}`}
                         />
                       ))}
@@ -1225,11 +1339,10 @@ console.log("helling",eventData[0])
               <>
                 <button
                   onClick={handleLike}
-                  className={`flex items-center px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                    isLiked
+                  className={`flex items-center px-4 py-2.5 rounded-lg transition-colors font-medium ${isLiked
                       ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
                       : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
+                    }`}
                   aria-label={isLiked ? "Remove from favorites" : "Add to favorites"}
                 >
                   {isLiked ? <FaHeart className="mr-2 h-4 w-4" /> : <FaRegHeart className="mr-2 h-4 w-4" />}
@@ -1243,18 +1356,7 @@ console.log("helling",eventData[0])
             >
               <FaShareAlt className="mr-2 h-4 w-4" /> Share
             </button>
-            <button
-              onClick={handleBookmark}
-              className={`flex items-center px-4 py-2.5 rounded-lg transition-colors font-medium ${
-                isSaved
-                  ? "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-              aria-label={isSaved ? "Remove from bookmarks" : "Save to bookmarks"}
-            >
-              {isSaved ? <FaBookmark className="mr-2 h-4 w-4" /> : <FaRegBookmark className="mr-2 h-4 w-4" />}
-              {isSaved ? "Saved" : "Save"}
-            </button>
+            
           </div>
         </div>
 
@@ -1266,14 +1368,14 @@ console.log("helling",eventData[0])
               Organizer Dashboard
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              {/* <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-sm text-gray-500 mb-1">Total Views</p>
                 <p className="text-2xl font-bold text-gray-900">{event.views || 0}</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-sm text-gray-500 mb-1">Bookmarks</p>
                 <p className="text-2xl font-bold text-gray-900">{event.bookmarks || 0}</p>
-              </div>
+              </div> */}
               <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-sm text-gray-500 mb-1">Status</p>
                 <p className="text-2xl font-bold text-gray-900 capitalize">{event.status}</p>
@@ -1335,21 +1437,21 @@ console.log("helling",eventData[0])
                     <p className="text-gray-900 font-medium">{event.location || "Online"}</p>
                     {event.latitude && event.longitude && (
                       <button className="text-indigo-600 text-sm mt-1 hover:text-indigo-700 hover:underline flex items-center"
-                      onClick={() => {
-                        // Open a map view using the coordinates
-                        // console.log('Coordinates:', formData.latitude, formData.longitude, pickedLocation);
-                        setShowLocationView(true)
-                      }}>
+                        onClick={() => {
+                          // Open a map view using the coordinates
+                          // console.log('Coordinates:', formData.latitude, formData.longitude, pickedLocation);
+                          setShowLocationView(true)
+                        }}>
                         <FaMapMarkedAlt className="mr-1 h-3.5 w-3.5" />
                         View on map
                       </button>
                     )}
-                     {showLocationView && (
-                                            <LocationViewModal
-                                              onClose={() => setShowLocationView(false)}
-                                              initialLngLat={pickedLocation}
-                                            />
-                                          )}
+                    {showLocationView && (
+                      <LocationViewModal
+                        onClose={() => setShowLocationView(false)}
+                        initialLngLat={pickedLocation}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -1390,8 +1492,8 @@ console.log("helling",eventData[0])
                 )}
               </div>
             </div>
- {/* Event Schedule */}
- {extractScheduleFromDescription(event.description).length > 0 && (
+            {/* Event Schedule */}
+            {extractScheduleFromDescription(event.description).length > 0 && (
               <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-6">
                 <div className="p-6 border-b border-gray-100">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center">
@@ -1417,20 +1519,20 @@ console.log("helling",eventData[0])
               </div>
             )}
             {/* Description */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden break-words">
-  <div className="p-6 border-b border-gray-100">
-    <h2 className="text-xl font-bold text-gray-900">Description</h2>
-  </div>
-  <div className="p-6">
-    {event.description ? (
-      <div className="prose max-w-none text-gray-700">
-        <ReactMarkdown>{event.description}</ReactMarkdown>
-      </div>
-    ) : (
-      <p className="text-gray-500 italic">No description provided.</p>
-    )}
-  </div>
-</div>
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden break-words">
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900">Description</h2>
+              </div>
+              <div className="p-6">
+                {event.description ? (
+                  <div className="prose max-w-none text-gray-700">
+                    <ReactMarkdown>{event.description}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No description provided.</p>
+                )}
+              </div>
+            </div>
 
 
             {/* Videos */}
@@ -1460,21 +1562,25 @@ console.log("helling",eventData[0])
                   <div>
                     <h3 className="font-medium text-lg text-gray-900">{event.organizer_name}</h3>
                     <p className="text-gray-600">{event.organizer_email}</p>
-                    <div className="mt-2 flex gap-2">
-                      <button className="text-indigo-600 text-sm hover:text-indigo-700 hover:underline flex items-center">
-                        <FaEnvelope className="mr-1 h-3.5 w-3.5" />
-                        Contact
-                      </button>
-                      <span className="text-gray-300">|</span>
-                      <button className="text-indigo-600 text-sm hover:text-indigo-700 hover:underline flex items-center">
-                        <FaRegStar className="mr-1 h-3.5 w-3.5" />
-                        View profile
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* // Add this after the Organizer info section in the left column */}
+<div className="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div className="p-6 border-b border-gray-100">
+    <h2 className="text-xl font-bold text-gray-900 flex items-center">
+      <FaRegStar className="mr-2 h-5 w-5 text-indigo-600" />
+      Attendee Feedback
+    </h2>
+  </div>
+  <div className="p-6">
+    <FeedbackSection />
+  </div>
+</div>
+
+
           </div>
 
           {/* Right column (1/3 width) */}
@@ -1487,14 +1593,11 @@ console.log("helling",eventData[0])
                 className="bg-white rounded-xl shadow-sm overflow-hidden mb-6"
               >
                 <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl font-bold text-gray-900">Registration</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Organizer Tools</h2>
                 </div>
                 <div className="p-6">
-                  {isOrganizer ? (
+                  
                     <>
-                      <div className="mb-6">
-                        <p className="text-lg font-medium text-gray-700">Organizer Tools</p>
-                      </div>
                       <button
                         onClick={handleViewAttendees}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-sm mb-3 flex items-center justify-center"
@@ -1502,70 +1605,8 @@ console.log("helling",eventData[0])
                         <FaUserFriends className="mr-2 h-4 w-4" />
                         View Attendees
                       </button>
-                      <button
-                        onClick={() => navigate(`/events/${id}/analytics`)}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center"
-                      >
-                        <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                          />
-                        </svg>
-                        View Analytics
-                      </button>
                     </>
-                  ) : (
-                    <>
-                      {isRegistrationExpired ? (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                          <p className="text-red-700 font-medium">Registration closed</p>
-                          <p className="text-red-600 text-sm mt-1">
-                            Registration ended on {formatDate(event.registration_expiry)}
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          {event.ticket_type === "paid" ? (
-                            <div className="mb-6">
-                              <p className="text-3xl font-bold text-gray-900 mb-1">
-                                {event.ticket_price} {event.currency}
-                              </p>
-                              <p className="text-gray-500 text-sm">Per ticket</p>
-                            </div>
-                          ) : (
-                            <div className="mb-6">
-                              <p className="text-3xl font-bold text-emerald-600 mb-1">Free</p>
-                              <p className="text-gray-500 text-sm">No payment required</p>
-                            </div>
-                          )}
-
-                          <button
-                            onClick={handleRegister}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3.5 px-4 rounded-lg transition-colors shadow-sm mb-4"
-                          >
-                            Register Now
-                          </button>
-
-                          <div className="text-center text-sm text-gray-500">
-                            {event.capacity ? (
-                              <p className="flex items-center justify-center">
-                                <FaUsers className="mr-1.5 h-4 w-4 text-gray-400" />
-                                {event.capacity} spots available
-                              </p>
-                            ) : (
-                              <p className="flex items-center justify-center">
-                                <FaUsers className="mr-1.5 h-4 w-4 text-gray-400" />
-                                Unlimited spots available
-                              </p>
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
+                
                 </div>
               </motion.div>
 

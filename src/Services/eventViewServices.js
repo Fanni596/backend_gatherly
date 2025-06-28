@@ -73,7 +73,7 @@ const eventViewService = {
   // Get event attendees (organizer only)
   getEventAttendees: async (eventId) => {
     try {
-      const response = await api.get(`/eventview/${eventId}/attendees`);
+      const response = await api.get(`/Event/${eventId}/attendees`);
       return response.data || [];
     } catch (error) {
       throw error.response?.data || { message: 'Error fetching attendees' };
@@ -158,7 +158,7 @@ const eventViewService = {
     }
   },
 
-  // Send email invite to an attendee
+  // Send email invite to an attendee for public 
   sendEmailInvite: async (eventId, attendeeId, message) => {
     try {
       const response = await api.post(`/eventview/${eventId}/send-email-invite/${attendeeId}`, { message });
@@ -168,7 +168,7 @@ const eventViewService = {
     }
   },
 
-  // Send SMS invite to an attendee
+  // Send SMS invite to an attendee for public
   sendSmsInvite: async (eventId, attendeeId, message) => {
     try {
       const response = await api.post(`/eventview/${eventId}/send-sms-invite/${attendeeId}`, { message });
@@ -197,6 +197,42 @@ checkAttendeeStatus: async (eventId, attendeeId) => {
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Error checking attendee status' };
+  }
+},
+// Add these methods to the eventViewService object
+checkPublicAttendee: async (eventId, email, phone) => {
+  console.log(eventId, email, phone);
+  try {
+    const response = await api.get(`/EventView/check-public-attendee`, {
+      params: { eventId, email, phone }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error checking public attendee' };
+  }
+},
+
+checkPrivateAttendee: async (eventId, email, phone) => {
+  try {
+    const response = await api.get(`/EventView/check-private-attendee`, {
+      params: { eventId, email, phone }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error checking private attendee' };
+  }
+},
+
+updateAttendee: async (eventId, attendeeId, attendeeData, visibility) => {
+  try {
+    const endpoint = visibility === 'public' 
+      ? `/Eventview/update-public-attendee/${attendeeId}`
+      : `/Eventview/update-private-attendee/${attendeeId}`;
+    
+    const response = await api.put(endpoint, attendeeData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error updating attendee' };
   }
 },
 };

@@ -64,7 +64,7 @@ const SuccessDisplay = ({ eventId, attendeeName }) => {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Complete!</h2>
           <p className="text-gray-600 mb-6">Welcome {attendeeName}! You're all set for the event.</p>
           <button 
-            onClick={() => navigate(`/event/${eventId}`)}
+            onClick={() => navigate(`/attendee/events/${eventId}/register`)}
             className="w-full px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-medium"
           >
             View Event Details
@@ -234,7 +234,6 @@ const OtpVerification = ({ eventId, attendeeId, phone, email, onSuccess }) => {
     setError(null);
     
     try {
-      const identifier = phone || email;
       
       if (phone) {
         await attendeeLoginService.sendPhoneVerification(phone);
@@ -285,6 +284,7 @@ const OtpVerification = ({ eventId, attendeeId, phone, email, onSuccess }) => {
       });
       
       // Mark attendee as confirmed
+      // await eventViewServices.markAsConfirmed(eventId, attendeeId);
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/AttendeeAuthentication/${eventId}/attendees/${attendeeId}/confirm`);
       
       onSuccess();

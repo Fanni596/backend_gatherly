@@ -139,7 +139,8 @@ const EditEvent = () => {
     ticketPrice: "",
     visibility: "public",
     registrationExpiry: null, // 7 days from now
-  })
+    capacity: "", // Add this new field
+  });
 
   // Media State
   const [imageFiles, setImageFiles] = useState([])
@@ -173,14 +174,7 @@ const EditEvent = () => {
       const startTime = eventData.start_time ? eventData.start_time.split(":").slice(0, 2).join(":") : "10:00";
       const endTime = eventData.end_time ? eventData.end_time.split(":").slice(0, 2).join(":") : "12:00";
 
-
-
-
       setPickedLocation({ lng: eventData.longitude, lat: eventData.latitude })
-
-
-
-
 
       // console.log("Picked Location:", { lng: eventData.longitude, lat: eventData.latitude })
       // Fetch event media
@@ -247,6 +241,7 @@ const EditEvent = () => {
         ticketPrice: eventData.ticket_price || "",
         visibility: eventData.visibility || "public",
         registrationExpiry: registrationExpiry,
+        capacity: eventData.capacity || "", // Add this line
       });
 
       setImageFiles(imagePreviews)
@@ -269,6 +264,7 @@ const EditEvent = () => {
           ticketPrice: eventData.ticket_price || "",
           visibility: eventData.visibility || "public",
           registrationExpiry: registrationExpiry,
+          capacity: eventData.capacity || "", // Add this line
         }),
         imageInfo: extractImageInfo(imagePreviews),
         videoInfo: extractVideoInfo(videoPreview),
@@ -295,43 +291,59 @@ const EditEvent = () => {
   // Add your existing validation, dropzone, and media handling functions from CreateEvent.jsx here
   // (validate, onImageDrop, onVideoDrop, handleRemoveImage, handleRemoveVideo, etc.)
   const validate = (step) => {
-    const newErrors = {}
-
-    console.log("Registration expiry:", formData.registrationExpiry)
-    console.log("coordinates:", pickedLocation)
+    const newErrors = {};
 
     if (step === 0) {
-      if (!formData.title.trim()) newErrors.title = "Event title is required"
+      if (!formData.title.trim()) newErrors.title = "Event title is required";
       if (imageFiles.length === 0 && videoFile === null) {
-        newErrors.media = "Image or Video is required"
+        newErrors.media = "Image or Video is required";
       }
-      if (!formData.summary.trim()) newErrors.summary = "Summary is required"
-      else if (formData.summary.length < 30) newErrors.summary = "Summary should be at least 30 characters"
+      if (!formData.summary.trim()) newErrors.summary = "Summary is required";
+      else if (formData.summary.length < 30) newErrors.summary = "Summary should be at least 30 characters";
     }
 
     if (step === 1) {
-      if (!formData.date) newErrors.date = "Date is required"
-      if (!formData.startTime) newErrors.startTime = "Start time is required"
-      if (!formData.endTime) newErrors.endTime = "End time is required"
+      if (!formData.date) newErrors.date = "Date is required";
+      if (!formData.startTime) newErrors.startTime = "Start time is required";
+      if (!formData.endTime) newErrors.endTime = "End time is required";
       if (!formData.location.trim()) {
-        newErrors.location = "Location is required for in-person events"
+        newErrors.location = "Location is required for in-person events";
       } else if (!pickedLocation.lat || !pickedLocation.lng) {
-        newErrors.location = "Location coordinates are required for in-person events"
+        newErrors.location = "Location coordinates are required for in-person events";
       }
     }
 
     if (step === 2) {
-      if (!formData.description.trim()) newErrors.description = "Description is required"
-      else if (formData.description.length < 50) newErrors.description = "Description should be at least 50 characters"
+      if (!formData.description.trim()) newErrors.description = "Description is required";
+      else if (formData.description.length < 50) newErrors.description = "Description should be at least 50 characters";
     }
 
-    if (step === 3 && formData.ticketType === "paid" && !formData.ticketPrice) {
-      newErrors.ticketPrice = "Ticket price is required for paid events"
+    if (step === 3) {
+      if (formData.ticketType === "paid" && !formData.ticketPrice) {
+        newErrors.ticketPrice = "Ticket price is required for paid events";
+      } else if (formData.ticketType === "paid" && Number(formData.ticketPrice) <= 0) {
+        newErrors.ticketPrice = "Ticket price must be greater than 0";
+      }
+
+      if (formData.capacity === null || formData.capacity === "") {
+        newErrors.capacity = "Event capacity is required";
+      } else if (isNaN(Number(formData.capacity)) || Number(formData.capacity) < 0) {
+        newErrors.capacity = "Capacity must be a non-negative number";
+      }
+
+      if (formData.registrationExpiry) {
+        const expiryDate = new Date(formData.registrationExpiry);
+        const eventDate = new Date(formData.date);
+
+        if (expiryDate >= eventDate) {
+          newErrors.registrationExpiry = "Registration deadline must be before the event date";
+        }
+      }
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   /**
    * Image Upload Handling
    * Processes dropped image files and creates preview URLs
@@ -868,15 +880,18 @@ const EditEvent = () => {
     };
 
     // Format the date correctly to avoid timezone issues
-    const formattedDate = new Date(formData.date);
-    formattedDate.setMinutes(formattedDate.getMinutes() - formattedDate.getTimezoneOffset());
-    const dateString = formattedDate.toISOString().split('T')[0];
+    const localDate = new Date(formData.date);
+    const dateString = `${localDate.getFullYear()}-${(localDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${localDate.getDate().toString().padStart(2, "0")}`;
+
 
     // Add all required fields with EXACT CASE MATCHING your backend
     formDataObj.append("Title", formData.title || "")
     formDataObj.append("Description", formData.description || "")
     formDataObj.append("summary", formData.summary || "")
-    formDataObj.append("StartDate", formData.date.toISOString().split("T")[0])
+    // formDataObj.append("StartDate", formData.date.toISOString().split("T")[0])
+    formDataObj.append("StartDate", dateString);
     formDataObj.append("StartTime", formData.startTime + ":00")
     formDataObj.append("EndTime", formData.endTime + ":00")
     formDataObj.append("Latitude", formData.latitude || "")
@@ -888,7 +903,7 @@ const EditEvent = () => {
     formDataObj.append("Visibility", formData.visibility || "public")
     formDataObj.append("OrganizerName", user.firstName + " " + user.lastName) // Add organizer name
     formDataObj.append("OrganizerEmail", user.email) // Add organizer email
-
+    formDataObj.append("Capacity", Number.parseInt(formData.capacity) || 0); // Add this line
 
     let thenValueListID;
     // 2. For public events, create a default attendee list
@@ -1332,7 +1347,7 @@ const EditEvent = () => {
               <div>
                 <p className="text-sm text-gray-500">Starting at</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {formData.ticketType === "free" ? "FREE" : `$${formData.ticketPrice || "0.00"}`}
+                  {formData.ticketType === "free" ? "FREE" : `PKR  ${formData.ticketPrice || "0.00"}`}
                 </p>
               </div>
               <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-8 rounded-lg text-lg font-medium transition-colors shadow-sm">
@@ -2189,69 +2204,7 @@ const EditEvent = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-base font-medium text-gray-900">Registration Deadline</h3>
-                      <p className="text-sm text-gray-600">Set when registration should close (optional)</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* // Update the registration expiry date picker to handle timezone correctly */}
-                        <div>
-                          <label className="block text-sm font-medium mb-1 text-gray-700">Date</label>
-                          <DatePicker
-                            selected={
-                              formData.registrationExpiry && !isNaN(new Date(formData.registrationExpiry))
-                                ? new Date(formData.registrationExpiry)
-                                : null
-                            }
-                            onChange={(date) => {
-                              if (date) {
-                                // Create a new date in local timezone but store as UTC
-                                const newDate = new Date(date);
-                                const oldDate = formData.registrationExpiry ? new Date(formData.registrationExpiry) : new Date();
 
-                                // Set hours/minutes from existing expiry or default to end of day
-                                newDate.setHours(oldDate.getHours());
-                                newDate.setMinutes(oldDate.getMinutes());
-
-                                setFormData({ ...formData, registrationExpiry: newDate });
-                              } else {
-                                setFormData({ ...formData, registrationExpiry: null });
-                              }
-                            }}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                            dateFormat="MMMM d, yyyy"
-                            minDate={new Date()}
-                            isClearable
-                            placeholderText="No deadline"
-                            wrapperClassName="w-full"
-                            showTimeSelect={false}
-                          />
-                        </div>
-
-                        {formData.registrationExpiry && (
-                          <div>
-                            <label className="block text-sm font-medium mb-1 text-gray-700">Time</label>
-                            <input
-                              type="time"
-                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                              value={
-                                formData.registrationExpiry
-                                  ? `${String(new Date(formData.registrationExpiry).getUTCHours()).padStart(2, "0")}:${String(new Date(formData.registrationExpiry).getUTCMinutes()).padStart(2, "0")}`
-                                  : "23:59"
-                              }
-                              onChange={(e) => {
-                                const [hours, minutes] = e.target.value.split(":");
-                                const newDate = new Date(formData.registrationExpiry);
-                                // Set UTC hours and minutes
-                                newDate.setUTCHours(Number.parseInt(hours));
-                                newDate.setUTCMinutes(Number.parseInt(minutes));
-                                setFormData({ ...formData, registrationExpiry: newDate });
-                              }}
-                            />
-                          </div>
-                        )}
-
-                      </div>
-                    </div>
                   </div>
                 </div>
               )}
@@ -2321,79 +2274,101 @@ const EditEvent = () => {
                 </div>
               )}
 
-              {/* Step 3: Tickets */}
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Tickets</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      className={`p-4 rounded-lg text-left transition-colors ${formData.ticketType === "free"
-                        ? "border-2 border-indigo-600 bg-indigo-50"
-                        : "border-2 hover:border-gray-400"
-                        }`}
-                      onClick={() => setFormData({ ...formData, ticketType: "free", ticketPrice: "" })}
-                    >
-                      <div className="flex items-center mb-2">
-                        <div
-                          className={`w-5 h-5 rounded-full border flex items-center justify-center mr-2 ${formData.ticketType === "free" ? "border-indigo-600 bg-indigo-600" : "border-gray-400"
-                            }`}
-                        >
-                          {formData.ticketType === "free" && (
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">Tickets & Capacity</h2>
+
+                  {/* Ticket Type */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="ticket-type" className="text-base font-medium text-gray-900">
+                        Ticket Type
+                      </label>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        className={`p-4 border-2 rounded-lg transition-colors ${formData.ticketType === "free"
+                          ? "border-indigo-600 bg-indigo-50"
+                          : "border-gray-300 hover:border-gray-400"
+                          }`}
+                        onClick={() => setFormData({ ...formData, ticketType: "free" })}
+                      >
+                        <div className="flex items-center mb-2">
+                          <div
+                            className={`w-5 h-5 rounded-full border flex items-center justify-center mr-2 ${formData.ticketType === "free" ? "border-indigo-600 bg-indigo-600" : "border-gray-400"
+                              }`}
+                          >
+                            {formData.ticketType === "free" && (
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-medium text-gray-900">Free</span>
                         </div>
-                        <span className="font-medium text-gray-900">Free</span>
-                      </div>
-                      <div className="text-sm text-gray-600 ml-7">No payment required</div>
-                    </button>
-                    <button
-                      type="button"
-                      className={`p-4 rounded-lg text-left transition-colors ${formData.ticketType === "paid"
-                        ? "border-2 border-indigo-600 bg-indigo-50"
-                        : "border-2 hover:border-gray-400"
-                        }`}
-                      onClick={() => setFormData({ ...formData, ticketType: "paid" })}
-                    >
-                      <div className="flex items-center mb-2">
-                        <div
-                          className={`w-5 h-5 rounded-full border flex items-center justify-center mr-2 ${formData.ticketType === "paid" ? "border-indigo-600 bg-indigo-600" : "border-gray-400"
-                            }`}
-                        >
-                          {formData.ticketType === "paid" && (
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
+                        <div className="text-sm text-gray-600 ml-7">Attendees don't pay to register</div>
+                      </button>
+                      <button
+                        type="button"
+                        className={`p-4 border-2 rounded-lg transition-colors ${formData.ticketType === "paid"
+                          ? "border-indigo-600 bg-indigo-50"
+                          : "border-gray-300 hover:border-gray-400"
+                          }`}
+                        onClick={() => setFormData({ ...formData, ticketType: "paid" })}
+                      >
+                        <div className="flex items-center mb-2">
+                          <div
+                            className={`w-5 h-5 rounded-full border flex items-center justify-center mr-2 ${formData.ticketType === "paid" ? "border-indigo-600 bg-indigo-600" : "border-gray-400"
+                              }`}
+                          >
+                            {formData.ticketType === "paid" && (
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-medium text-gray-900">Paid</span>
                         </div>
-                        <span className="font-medium text-gray-900">Paid</span>
-                      </div>
-                      <div className="text-sm text-gray-600 ml-7">Collect payment</div>
-                    </button>
+                        <div className="text-sm text-gray-600 ml-7">Charge attendees to register</div>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Ticket Price (if paid) */}
+                  {/* Ticket Price (shown only for paid events) */}
                   {formData.ticketType === "paid" && (
-                    <div className="mt-6 p-5 bg-indigo-50 rounded-lg border border-indigo-100">
-                      <label className="block text-base font-medium mb-2 text-gray-900">
-                        Ticket Price ($) <span className="text-red-500">*</span>
-                      </label>
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <label htmlFor="ticket-price" className="text-base font-medium text-gray-900">
+                          Ticket Price
+                        </label>
+                        <span className="text-xs text-gray-500 font-medium px-2 py-0.5 bg-gray-100 rounded-full">
+                          Required
+                        </span>
+                      </div>
                       <div className="relative">
-                        <span className="absolute left-3 top-3 text-gray-500">$</span>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-600 sm:text-sm">PKR</span>
+                        </div>
                         <input
                           type="number"
+                          id="ticket-price"
                           placeholder="0.00"
-                          className={`w-full pl-8 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.ticketPrice ? "border-red-500 bg-red-50" : "border-gray-300"
+                          className={`pl-12 w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.ticketPrice && touched.ticketPrice ? "border-red-500 bg-red-50" : "border-gray-300"
                             }`}
                           value={formData.ticketPrice}
-                          onChange={(e) => setFormData({ ...formData, ticketPrice: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Only allow positive numbers with up to 2 decimal places
+                            if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
+                              setFormData({ ...formData, ticketPrice: value });
+                            }
+                          }}
                           onBlur={() => handleBlur("ticketPrice")}
                           min="0"
                           step="0.01"
                         />
-                        {errors.ticketPrice && (
+                        {errors.ticketPrice && touched.ticketPrice && (
                           <p className="text-sm text-red-600 mt-1 flex items-center">
                             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
@@ -2407,11 +2382,102 @@ const EditEvent = () => {
                           </p>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Enter the price per ticket. You'll be able to create different ticket tiers after publishing.
-                      </p>
                     </div>
                   )}
+
+                  {/* Capacity */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="capacity" className="text-base font-medium text-gray-900">
+                        Event Capacity
+                      </label>
+                      <span className="text-xs text-gray-500 font-medium px-2 py-0.5 bg-gray-100 rounded-full">
+                        Required
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Maximum number of attendees allowed. Set to 0 for unlimited capacity.
+                    </p>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        id="capacity"
+                        min="1"
+                        placeholder="Enter capacity"
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.capacity && touched.capacity ? "border-red-500 bg-red-50" : "border-gray-300"
+                          }`}
+                        value={formData.capacity}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Only allow non-negative integers
+                          if (/^\d*$/.test(value) || value === "") {
+                            setFormData({ ...formData, capacity: value });
+                          }
+                        }}
+                        onBlur={() => handleBlur("capacity")}
+                      />
+                      {errors.capacity && touched.capacity && (
+                        <p className="text-sm text-red-600 mt-1 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                          </svg>
+                          {errors.capacity}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Registration Deadline */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <label htmlFor="registration-expiry" className="text-base font-medium text-gray-900">
+                        Registration Deadline
+                      </label>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Set a deadline for when registration closes. Must be before the event start time.
+                    </p>
+                    <div className="relative">
+                      <DatePicker
+                        selected={formData.registrationExpiry}
+                        onChange={(date) => {
+                          // Ensure the deadline is before the event date
+                          const eventDate = new Date(formData.date);
+                          if (date && date < eventDate) {
+                            setFormData({ ...formData, registrationExpiry: date });
+                          } else {
+                            showSnackbar("Registration deadline must be before the event date", "error");
+                          }
+                        }}
+                        showTimeSelect
+                        dateFormat="MMMM d, yyyy h:mm aa"
+                        minDate={new Date()}
+                        maxDate={new Date(formData.date)}
+                        placeholderText="Select deadline date and time"
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${errors.registrationExpiry ? "border-red-500 bg-red-50" : "border-gray-300"
+                          }`}
+                        onBlur={() => handleBlur("registrationExpiry")}
+                      />
+                      {errors.registrationExpiry && (
+                        <p className="text-sm text-red-600 mt-1 flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            />
+                          </svg>
+                          {errors.registrationExpiry}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -2489,7 +2555,7 @@ const EditEvent = () => {
                                 <span className="text-emerald-600 font-medium">Free</span>
                               ) : (
                                 <span>
-                                  Paid - <span className="font-medium">${formData.ticketPrice || "0.00"}</span>
+                                  Paid - <span className="font-medium">PKR {formData.ticketPrice || "0.00"}</span>
                                 </span>
                               )}
                             </p>
@@ -2645,7 +2711,7 @@ const EditEvent = () => {
                                 <span className="text-emerald-600 font-medium">Free</span>
                               ) : (
                                 <span>
-                                  Paid - <span className="font-medium">${formData.ticketPrice || "0.00"}</span>
+                                  Paid - <span className="font-medium">PKR {formData.ticketPrice || "0.00"}</span>
                                 </span>
                               )}
                             </p>

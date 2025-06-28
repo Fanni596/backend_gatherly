@@ -67,7 +67,7 @@ const AttendeesPage = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    
+
     const [attendees, setAttendees] = useState([]);
     const [listDetails, setListDetails] = useState({ name: '', description: '' });
     const [loading, setLoading] = useState(false);
@@ -128,7 +128,7 @@ const AttendeesPage = () => {
         if (attendees.length > 0) {
             const paying = attendees.filter(a => a.IsPaying).length;
             const totalAllowed = attendees.reduce((sum, a) => sum + a.AllowedPeople, 0);
-            
+
             setStats({
                 total: attendees.length,
                 paying,
@@ -172,14 +172,14 @@ const AttendeesPage = () => {
                 // Handle null values
                 if (a[sortConfig.key] === null) return 1;
                 if (b[sortConfig.key] === null) return -1;
-                
+
                 // Handle string comparison
                 if (typeof a[sortConfig.key] === 'string') {
-                    return sortConfig.direction === 'ascending' 
+                    return sortConfig.direction === 'ascending'
                         ? a[sortConfig.key].localeCompare(b[sortConfig.key])
                         : b[sortConfig.key].localeCompare(a[sortConfig.key]);
                 }
-                
+
                 // Handle number comparison
                 if (a[sortConfig.key] < b[sortConfig.key]) {
                     return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -218,7 +218,7 @@ const AttendeesPage = () => {
         setLoading(true);
         try {
             const response = await axios.get(
-                import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/getlistdetails:${listId}`,
+                import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/getlistdetails:${listId}`,
                 { withCredentials: true }
             );
             setListDetails({
@@ -236,7 +236,7 @@ const AttendeesPage = () => {
         setLoading(true);
         try {
             const response = await axios.get(
-                import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/getall?listId=${listId}`,
+                import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/getall?listId=${listId}`,
                 { withCredentials: true }
             );
             setAttendees(Array.isArray(response.data) ? response.data : []);
@@ -257,9 +257,10 @@ const AttendeesPage = () => {
             errors.Email = 'Invalid email format';
         }
         if (!attendee.Phone.trim()) errors.Phone = 'Phone is required';
-        else if (!/^[0-9]{10,15}$/.test(attendee.Phone)) {
-            errors.Phone = 'Phone must be 10-15 digits';
-        }
+        else if (!/^\+[0-9]{10,15}$/.test(attendee.Phone)) {
+    errors.Phone = 'Phone must start with + and be followed by 10 to 15 digits';
+}
+
         if (attendee.AllowedPeople < 1) {
             errors.AllowedPeople = 'Must allow at least 1 person';
         }
@@ -276,7 +277,7 @@ const AttendeesPage = () => {
         setLoading(true);
         try {
             await axios.post(
-                import.meta.env.VITE_API_BASE_URL+'/organizer/Attendees/create',
+                import.meta.env.VITE_API_BASE_URL + '/organizer/Attendees/create',
                 newAttendee,
                 { withCredentials: true }
             );
@@ -292,13 +293,13 @@ const AttendeesPage = () => {
                 IsPaying: false,
             });
             setValidationErrors({});
-            fetchAttendees();
         } catch (error) {
             showSnackbar(
                 error.response?.data?.message || 'Failed to create attendee. Please try again.',
                 'error'
             );
         } finally {
+            fetchAttendees();
             setLoading(false);
         }
     };
@@ -313,7 +314,7 @@ const AttendeesPage = () => {
         setLoading(true);
         try {
             await axios.put(
-                import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/updateby:${editAttendee.Id}`,
+                import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/updateby:${editAttendee.Id}`,
                 editAttendee,
                 { withCredentials: true }
             );
@@ -357,7 +358,7 @@ const AttendeesPage = () => {
                         [bulkEditField]: value
                     };
                     return axios.put(
-                        import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/updateby:${id}`,
+                        import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/updateby:${id}`,
                         updatedAttendee,
                         { withCredentials: true }
                     );
@@ -379,7 +380,7 @@ const AttendeesPage = () => {
         setLoading(true);
         try {
             await axios.delete(
-                import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/deleteby:${modals.delete}`,
+                `${import.meta.env.VITE_API_BASE_URL}/organizer/Attendees/deleteby:${modals.delete}?ListId=${listId}`,
                 { withCredentials: true }
             );
             showSnackbar('Attendee deleted successfully!', 'success');
@@ -403,7 +404,7 @@ const AttendeesPage = () => {
             await Promise.all(
                 selectedAttendees.map(id =>
                     axios.delete(
-                        import.meta.env.VITE_API_BASE_URL+`/organizer/Attendees/deleteby:${id}`,
+                        import.meta.env.VITE_API_BASE_URL + `/organizer/Attendees/deleteby:${id}`,
                         { withCredentials: true }
                     )
                 )
@@ -508,7 +509,7 @@ const AttendeesPage = () => {
                         IsPaying: attendee.IsPaying || false,
                     };
                     return axios.post(
-                        import.meta.env.VITE_API_BASE_URL+'/organizer/Attendees/create',
+                        import.meta.env.VITE_API_BASE_URL + '/organizer/Attendees/create',
                         payload,
                         { withCredentials: true }
                     );
@@ -534,7 +535,7 @@ const AttendeesPage = () => {
                     Email: attendee.Email || '',
                     Phone: attendee.Phone,
                     AllowedPeople: attendee.AllowedPeople,
-                    PaymentStatus: attendee.IsPaying ? 'Paying' : 'Non-paying'
+                    PaymentStatus: attendee.IsPaying ? 'True' : 'False'
                 }))
             : attendees.map(attendee => ({
                 FirstName: attendee.FirstName,
@@ -542,7 +543,7 @@ const AttendeesPage = () => {
                 Email: attendee.Email || '',
                 Phone: attendee.Phone,
                 AllowedPeople: attendee.AllowedPeople,
-                PaymentStatus: attendee.IsPaying ? 'Paying' : 'Non-paying'
+                PaymentStatus: attendee.IsPaying ? 'True' : 'False'
             }));
 
         if (dataToExport.length === 0) {
@@ -609,7 +610,7 @@ const AttendeesPage = () => {
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
-        
+
         // Set filter based on tab
         if (newValue === 0) {
             setFilterPaymentStatus('all');
@@ -626,10 +627,10 @@ const AttendeesPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-10">
-            <Backdrop 
-                open={loading} 
-                sx={{ 
-                    color: '#fff', 
+            <Backdrop
+                open={loading}
+                sx={{
+                    color: '#fff',
                     zIndex: (theme) => theme.zIndex.drawer + 1,
                     backdropFilter: 'blur(2px)'
                 }}
@@ -674,26 +675,26 @@ const AttendeesPage = () => {
                                 <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                                     {listDetails.description || 'No description provided'}
                                 </Typography>
-                                
+
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                    <Chip 
-                                        icon={<FiUsers size={14} />} 
-                                        label={`${stats.total} Attendees`} 
-                                        color="primary" 
+                                    <Chip
+                                        icon={<FiUsers size={14} />}
+                                        label={`${stats.total} Attendees`}
+                                        color="primary"
                                     />
-                                    <Chip 
-                                        icon={<FiDollarSign size={14} />} 
-                                        label={`${stats.paying} Paying`} 
-                                        color="secondary" 
+                                    <Chip
+                                        icon={<FiDollarSign size={14} />}
+                                        label={`${stats.paying} Paying`}
+                                        color="secondary"
                                     />
-                                    <Chip 
-                                        icon={<FiUser size={14} />} 
-                                        label={`${stats.totalAllowed} Total Allowed`} 
-                                        color="default" 
+                                    <Chip
+                                        icon={<FiUser size={14} />}
+                                        label={`${stats.totalAllowed} Total Allowed`}
+                                        color="default"
                                     />
                                 </Box>
                             </Box>
-                            
+
                             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, mt: { xs: 2, md: 0 } }}>
                                 <Button
                                     variant="outlined"
@@ -729,6 +730,7 @@ const AttendeesPage = () => {
                                         </InputAdornment>
                                     ),
                                 }}
+                                type="search"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 size="small"
@@ -772,26 +774,26 @@ const AttendeesPage = () => {
 
                         {/* Tabs for filtering - visible on larger screens */}
                         <Box sx={{ display: { xs: 'none', md: 'block' }, mt: 2 }}>
-                            <Tabs 
-                                value={tabValue} 
+                            <Tabs
+                                value={tabValue}
                                 onChange={handleTabChange}
                                 indicatorColor="primary"
                                 textColor="primary"
                                 variant="fullWidth"
                             >
-                                <Tab 
-                                    label={`All Attendees (${stats.total})`} 
-                                    icon={<FiUsers size={16} />} 
+                                <Tab
+                                    label={`All Attendees (${stats.total})`}
+                                    icon={<FiUsers size={16} />}
                                     iconPosition="start"
                                 />
-                                <Tab 
-                                    label={`Paying (${stats.paying})`} 
-                                    icon={<FiDollarSign size={16} />} 
+                                <Tab
+                                    label={`Paying (${stats.paying})`}
+                                    icon={<FiDollarSign size={16} />}
                                     iconPosition="start"
                                 />
-                                <Tab 
-                                    label={`Non-Paying (${stats.nonPaying})`} 
-                                    icon={<FiUser size={16} />} 
+                                <Tab
+                                    label={`Non-Paying (${stats.nonPaying})`}
+                                    icon={<FiUser size={16} />}
                                     iconPosition="start"
                                 />
                             </Tabs>
@@ -815,17 +817,17 @@ const AttendeesPage = () => {
                                                     selectedAttendees.length === filteredAndSortedAttendees.length
                                                 }
                                                 onChange={handleSelectAll}
-                                                sx={{ 
-                                                    color: 'common.white', 
+                                                sx={{
+                                                    color: 'common.white',
                                                     '&.Mui-checked': { color: 'common.white' },
                                                     '&.MuiCheckbox-indeterminate': { color: 'common.white' }
                                                 }}
                                             />
                                         </TableCell>
                                         <TableCell
-                                            sx={{ 
-                                                color: 'common.white', 
-                                                fontWeight: 'bold', 
+                                            sx={{
+                                                color: 'common.white',
+                                                fontWeight: 'bold',
                                                 cursor: 'pointer'
                                             }}
                                             onClick={() => requestSort('FirstName')}
@@ -834,9 +836,9 @@ const AttendeesPage = () => {
                                         </TableCell>
                                         {!isMobile && (
                                             <TableCell
-                                                sx={{ 
-                                                    color: 'common.white', 
-                                                    fontWeight: 'bold', 
+                                                sx={{
+                                                    color: 'common.white',
+                                                    fontWeight: 'bold',
                                                     cursor: 'pointer'
                                                 }}
                                                 onClick={() => requestSort('Email')}
@@ -845,9 +847,9 @@ const AttendeesPage = () => {
                                             </TableCell>
                                         )}
                                         <TableCell
-                                            sx={{ 
-                                                color: 'common.white', 
-                                                fontWeight: 'bold', 
+                                            sx={{
+                                                color: 'common.white',
+                                                fontWeight: 'bold',
                                                 cursor: 'pointer'
                                             }}
                                             onClick={() => requestSort('AllowedPeople')}
@@ -869,7 +871,7 @@ const AttendeesPage = () => {
                                                         onChange={(event) => handleSelectAttendee(event, attendee.Id)}
                                                     />
                                                 </TableCell>
-                                                <TableCell 
+                                                <TableCell
                                                     sx={{ minWidth: 200 }}
                                                 >
                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -965,8 +967,8 @@ const AttendeesPage = () => {
                                                         {searchTerm ? 'No matching attendees found' : 'No attendees available'}
                                                     </Typography>
                                                     <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 3 }}>
-                                                        {searchTerm 
-                                                            ? 'Try adjusting your search or filters' 
+                                                        {searchTerm
+                                                            ? 'Try adjusting your search or filters'
                                                             : 'Add your first attendee to get started'}
                                                     </Typography>
                                                     {!searchTerm && (
@@ -1000,8 +1002,8 @@ const AttendeesPage = () => {
                 maxWidth="sm"
                 fullWidth
             >
-                <DialogTitle sx={{ 
-                    bgcolor: theme.palette.primary.main, 
+                <DialogTitle sx={{
+                    bgcolor: theme.palette.primary.main,
                     color: 'common.white'
                 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1146,12 +1148,13 @@ const AttendeesPage = () => {
                         Cancel
                     </Button>
                     <Button
+                        onClick={handleCreateAttendee}
                         variant="contained"
                         color="primary"
-                        onClick={handleCreateAttendee}
-                        startIcon={<FiPlus />}
+                        disabled={loading} // Disable while loading
+                        startIcon={loading && <CircularProgress size={20} color="inherit" />} // Show loader
                     >
-                        Create Attendee
+                        {loading ? 'Creating...' : 'Create Attendee'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1166,8 +1169,8 @@ const AttendeesPage = () => {
                 maxWidth="sm"
                 fullWidth
             >
-                <DialogTitle sx={{ 
-                    bgcolor: theme.palette.primary.main, 
+                <DialogTitle sx={{
+                    bgcolor: theme.palette.primary.main,
                     color: 'common.white'
                 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1315,9 +1318,11 @@ const AttendeesPage = () => {
                         variant="contained"
                         color="primary"
                         onClick={handleEditAttendee}
-                        startIcon={<FiCheck />}
+                        startIcon=
+                        {loading ? <CircularProgress size={20} color="inherit" /> : <FiCheck />}
+                        disabled={loading} // Disable while loading
                     >
-                        Save Changes
+                        {loading ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1333,8 +1338,8 @@ const AttendeesPage = () => {
                 maxWidth="sm"
                 fullWidth
             >
-                <DialogTitle sx={{ 
-                    bgcolor: theme.palette.primary.main, 
+                <DialogTitle sx={{
+                    bgcolor: theme.palette.primary.main,
                     color: 'common.white'
                 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1358,7 +1363,7 @@ const AttendeesPage = () => {
                     <TextField
                         select
                         fullWidth
-                        label="Field to Edit"
+                        label="Select field to Edit"
                         value={bulkEditField}
                         onChange={(e) => {
                             setBulkEditField(e.target.value);
@@ -1376,11 +1381,9 @@ const AttendeesPage = () => {
                         }}
                         sx={{ mb: 3 }}
                     >
-                        <option value="">Select a field</option>
+                        <option value=""></option>
                         <option value="FirstName">First Name</option>
                         <option value="LastName">Last Name</option>
-                        <option value="Email">Email</option>
-                        <option value="Phone">Phone</option>
                         <option value="AllowedPeople">Allowed People</option>
                         <option value="IsPaying">Payment Status</option>
                     </TextField>
@@ -1451,13 +1454,15 @@ const AttendeesPage = () => {
                         color="primary"
                         onClick={handleBulkEdit}
                         disabled={
+                            loading ||
                             !bulkEditField ||
                             (bulkEditField !== 'IsPaying' && !bulkEditValue) ||
                             (bulkEditField === 'IsPaying' && bulkEditValue === undefined)
                         }
                         startIcon={<FiCheck />}
+                        sx={{ minWidth: 120 }}
                     >
-                        Apply Changes
+                        {loading ? <CircularProgress size={20} color="inherit" /> : 'Apply Changes'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1467,7 +1472,7 @@ const AttendeesPage = () => {
                 open={!!modals.delete}
                 onClose={() => setModals({ ...modals, delete: false })}
             >
-                <DialogTitle sx={{ 
+                <DialogTitle sx={{
                     color: theme.palette.error.main,
                     display: 'flex',
                     alignItems: 'center',
@@ -1492,8 +1497,9 @@ const AttendeesPage = () => {
                         color="error"
                         onClick={handleDeleteAttendee}
                         startIcon={<FiTrash />}
+                        disabled={loading} // Disable while loading
                     >
-                        Delete
+                        {loading ? <CircularProgress size={20} color="inherit" /> : 'Delete'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1505,8 +1511,8 @@ const AttendeesPage = () => {
                 maxWidth="md"
                 fullWidth
             >
-                <DialogTitle sx={{ 
-                    bgcolor: theme.palette.primary.main, 
+                <DialogTitle sx={{
+                    bgcolor: theme.palette.primary.main,
                     color: 'common.white'
                 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1530,11 +1536,11 @@ const AttendeesPage = () => {
                         <Typography variant="body1" gutterBottom>
                             Upload an Excel file to import attendees. The file should include these columns:
                         </Typography>
-                        <Box sx={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
-                            gap: 2, 
-                            mt: 2, 
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                            gap: 2,
+                            mt: 2,
                             mb: 3,
                             p: 2,
                             bgcolor: 'rgba(0, 0, 0, 0.02)',
@@ -1576,7 +1582,7 @@ const AttendeesPage = () => {
                         </Button>
                     </Box>
 
-                    <Box sx={{ 
+                    <Box sx={{
                         border: `2px dashed ${theme.palette.divider}`,
                         borderRadius: 2,
                         p: 3,
@@ -1602,7 +1608,7 @@ const AttendeesPage = () => {
                             </Button>
                         </label>
                         <Typography variant="body2" color="text.secondary">
-                            Drag and drop your Excel file here, or click to select
+                            click to select
                         </Typography>
                     </Box>
 
@@ -1671,10 +1677,11 @@ const AttendeesPage = () => {
                         variant="contained"
                         color="primary"
                         onClick={handleSaveParsedAttendees}
-                        disabled={parsedAttendees.length === 0}
+                        disabled={loading || parsedAttendees.length === 0}
                         startIcon={<FiUpload />}
                     >
-                        Import {parsedAttendees.length} Attendees
+                        {loading ? <CircularProgress size={20} color="inherit" /> : 'Import '+parsedAttendees.length+' Attendees'}
+                        
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1803,14 +1810,22 @@ const AttendeesPage = () => {
                     </Box>
                 </MenuItem>
             </Menu>
-
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={loading} // This state is already used for all major async operations
+            >
+                <Box sx={{ textAlign: 'center' }}>
+                    <CircularProgress color="inherit" />
+                    <Typography sx={{ mt: 2 }}>Loading...</Typography> {/* Or "Processing..." */}
+                </Box>
+            </Backdrop>
             {/* Snackbar */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                sx={{ 
+                sx={{
                     '& .MuiAlert-root': {
                         borderRadius: 2,
                         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',

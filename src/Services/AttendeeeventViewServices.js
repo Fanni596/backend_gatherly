@@ -47,41 +47,111 @@ const AttendeeeventViewService = {
     }
   },
 
-  // Get event statistics (organizer only)
-  getEventStatistics: async (eventId) => {
+  // Get event statistics (attendee side)
+  getEventAttendeesStatistics: async (listId) => {
     try {
-      const response = await api.get(`/eventview/${eventId}/statistics`);
+      const response = await api.get(`/AttendeeEvents/stats_confirmed?listId=${listId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error fetching statistics' };
     }
   },
 
-  // Register for an event (public access)
-  registerForEvent: async (eventId, registrationData) => {
-    try {
-      const response = await api.post(
-        `/eventview/${eventId}/register`,
-        registrationData
-      );
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { message: 'Error registering for event' };
-    }
-  },
 
-  // Check registration status (for authenticated users)
-  checkRegistrationStatus: async (eventId) => {
-    try {
-      const response = await api.get(`/eventview/${eventId}/registration-status`);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 401) {
-        return { registered: false, message: 'Not authenticated' };
-      }
-      throw error.response?.data || { message: 'Error checking registration status' };
+  // Get attendee lists for an event attendee side without jwt
+getEventAttendeeLists: async (eventId) => {
+  try {
+    const response = await api.get(`/AttendeeEvents/${eventId}/attendee-lists`);
+    return response.data || [];
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return [];
     }
+    throw error.response?.data || { message: 'Error fetching attendee lists' };
   }
+},
+  // // Register for an event (public access)
+  // registerForEvent: async (eventId, registrationData) => {
+  //   try {
+  //     const response = await api.post(
+  //       `/eventview/${eventId}/register`,
+  //       registrationData
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     throw error.response?.data || { message: 'Error registering for event' };
+  //   }
+  // },
+
+  // // Check registration status (for authenticated users)
+  // checkRegistrationStatus: async (eventId) => {
+  //   try {
+  //     const response = await api.get(`/eventview/${eventId}/registration-status`);
+  //     return response.data;
+  //   } catch (error) {
+  //     if (error.response?.status === 401) {
+  //       return { registered: false, message: 'Not authenticated' };
+  //     }
+  //     throw error.response?.data || { message: 'Error checking registration status' };
+  //   }
+  // }
+   // Register for an event
+  // Register for an event
+registerForEvent: async (eventId, registrationData) => {
+  try {
+    const response = await api.post(`/AttendeeEvents/${eventId}/register`, registrationData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error registering for event' };
+  }
+},
+
+// Check registration status
+checkRegistrationStatus: async (eventId) => {
+  try {
+    const response = await api.get(`/AttendeeEvents/${eventId}/check-registration`);
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return { isRegistered: false, message: 'Not authenticated' };
+    }
+    throw error.response?.data || { message: 'Error checking registration status' };
+  }
+},
+
+// Confirm attendee (after verification/payment)
+confirmAttendee: async (eventId, attendeeId, isPaid = false) => {
+  try {
+    const response = await api.post(`/AttendeeEvents/${eventId}/confirm-attendee`, {
+      attendeeId,
+      isPaid
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error confirming attendee' };
+  }
+},
+// Add these methods to AttendeeeventViewService
+
+// Check payment status
+checkPaymentStatus: async (eventId, attendeeId) => {
+  try {
+    const response = await api.get(`/AttendeeEvents/${eventId}/payment-status/${attendeeId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error checking payment status' };
+  }
+},
+
+// Get payment details
+getPaymentDetails: async (paymentId) => {
+  try {
+    const response = await api.get(`/payment/status/${paymentId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Error fetching payment details' };
+  }
+}
 };
 
 export default AttendeeeventViewService;

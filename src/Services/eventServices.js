@@ -309,6 +309,7 @@ registerAttendee: async (eventId, attendeeData) => {
   }
 },
 
+
 };
 
 export default eventService;
