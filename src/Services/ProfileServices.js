@@ -7,7 +7,7 @@ const api = axios.create({
   withCredentials: true
 });
 
-const profileService = {
+const ProfileService = {
   // Get user profile
   getProfile: async () => {
     try {
@@ -110,4 +110,4 @@ const profileService = {
   },
 };
 
-export default profileService;
+export default ProfileService;
